@@ -1,0 +1,8 @@
+<component name="ProjectCodeStyleConfiguration">
+  <code_scheme name="Project" version="173">
+    <option name="LINE_SEPARATOR" value="&#10;" />
+    <codeStyleSettings language="JAVA">
+      <option name="SPACE_WITHIN_PARENTHESES" value="true" />
+    </codeStyleSettings>
+  </code_scheme>
+</component>
