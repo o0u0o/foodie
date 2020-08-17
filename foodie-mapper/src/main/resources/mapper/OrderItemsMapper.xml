@@ -2,9 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.o0u0o.mapper.OrderItemsMapper">
   <resultMap id="BaseResultMap" type="com.o0u0o.pojo.OrderItems">
-    <!--
-      WARNING - @mbg.generated
-    -->
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="order_id" jdbcType="VARCHAR" property="orderId" />
     <result column="item_id" jdbcType="VARCHAR" property="itemId" />

@@ -2,9 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.o0u0o.mapper.CarouselMapper">
   <resultMap id="BaseResultMap" type="com.o0u0o.pojo.Carousel">
-    <!--
-      WARNING - @mbg.generated
-    -->
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="image_url" jdbcType="VARCHAR" property="imageUrl" />
     <result column="background_color" jdbcType="VARCHAR" property="backgroundColor" />

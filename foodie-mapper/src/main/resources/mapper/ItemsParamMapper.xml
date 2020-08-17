@@ -2,9 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.o0u0o.mapper.ItemsParamMapper">
   <resultMap id="BaseResultMap" type="com.o0u0o.pojo.ItemsParam">
-    <!--
-      WARNING - @mbg.generated
-    -->
     <id column="id" jdbcType="VARCHAR" property="id" />
     <result column="item_id" jdbcType="VARCHAR" property="itemId" />
     <result column="produc_place" jdbcType="VARCHAR" property="producPlace" />
