@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @Author aiuiot
  * @Date 2020/5/24 5:38 下午
- * @Descripton:
+ * @Descripton:  用户测试
  **/
 @RestController
 public class StuFooController {

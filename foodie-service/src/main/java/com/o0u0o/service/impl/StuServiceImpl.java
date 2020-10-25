@@ -27,14 +27,16 @@ public class StuServiceImpl implements StuService {
         Stu stu = new Stu();
         stu.setName("parent");
         stu.setAge(19);
+        stu.setGender("男");
         stuMapper.insert(stu);
     }
 
-    @Transactional(propagation = Propagation.REQUIRED)
+    @Transactional(propagation = Propagation.NESTED)
+//    @Transactional(propagation = Propagation.MANDATORY)
     @Override
     public void saveChildren(){
         saveChild1();
-        int a = 1 / 0;
+//        int a = 1 / 0;
         saveChild2();
     }
 
@@ -56,7 +58,7 @@ public class StuServiceImpl implements StuService {
 
     /**
      * 查询
-     * 添加了事物的支持
+     * 添加了事物的支持 事务的传播 默认-REQUIRED
      * @param id
      * @return
      */
@@ -65,6 +67,7 @@ public class StuServiceImpl implements StuService {
     public Stu getStuInfo(int id) {
         return stuMapper.selectByPrimaryKey(id);
     }
+
 
     @Transactional(propagation = Propagation.REQUIRED)
     @Override

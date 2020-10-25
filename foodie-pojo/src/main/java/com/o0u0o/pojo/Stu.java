@@ -10,6 +10,7 @@ public class Stu {
 
     private Integer age;
 
+    /** 性别 */
     private String gender;
 
     /**

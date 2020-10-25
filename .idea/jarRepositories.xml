@@ -26,5 +26,10 @@
       <option name="name" value="Central Repository" />
       <option name="url" value="http://172.17.5.111:3333/repository/lzb/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="internal-repository" />
+      <option name="name" value="Internal Repository Manager" />
+      <option name="url" value="http://172.17.5.111:3333/repository/lzb/" />
+    </remote-repository>
   </component>
 </project>

@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 /**
  * @Author aiuiot
  * @Date 2020/5/24 9:15 下午
- * @Descripton: 事物演示测试
+ * @Descripton: 事务演示测试
  **/
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = Application.class)
@@ -25,6 +25,9 @@ public class TransTest {
     @Autowired
     private TestTransService testTransService;
 
+    /**
+     * 测试事务
+     */
     @Test
     public void myTest(){
         testTransService.testPropagationTrans();
