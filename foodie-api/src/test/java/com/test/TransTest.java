@@ -4,6 +4,7 @@ import com.o0u0o.Application;
 import com.o0u0o.service.StuService;
 import com.o0u0o.service.TestTransService;
 import com.o0u0o.service.impl.TestTransactionalServiceImpl;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ public class TransTest {
     /**
      * 测试事务
      */
+    @Ignore
     @Test
     public void myTest(){
         testTransService.testPropagationTrans();

@@ -1,56 +1,43 @@
 package com.o0u0o.pojo;
 
-import javax.persistence.*;
 
 public class Users {
-    @Column(name = "USER")
-    private String user;
-
-    @Column(name = "CURRENT_CONNECTIONS")
-    private Long currentConnections;
-
-    @Column(name = "TOTAL_CONNECTIONS")
-    private Long totalConnections;
+    /**
+     * 主键ID 用户ID
+     */
+    private String id;
 
     /**
-     * @return USER
+     * 用户名 用户名
      */
-    public String getUser() {
-        return user;
+    private String username;
+
+    /**
+     * 密码 密码
+     */
+    private String password;
+
+    public String getId() {
+        return id;
     }
 
-    /**
-     * @param user
-     */
-    public void setUser(String user) {
-        this.user = user;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    /**
-     * @return CURRENT_CONNECTIONS
-     */
-    public Long getCurrentConnections() {
-        return currentConnections;
+    public String getUsername() {
+        return username;
     }
 
-    /**
-     * @param currentConnections
-     */
-    public void setCurrentConnections(Long currentConnections) {
-        this.currentConnections = currentConnections;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    /**
-     * @return TOTAL_CONNECTIONS
-     */
-    public Long getTotalConnections() {
-        return totalConnections;
+    public String getPassword() {
+        return password;
     }
 
-    /**
-     * @param totalConnections
-     */
-    public void setTotalConnections(Long totalConnections) {
-        this.totalConnections = totalConnections;
+    public void setPassword(String password) {
+        this.password = password;
     }
 }

@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import tk.mybatis.spring.annotation.MapperScan;
 
 /**
- * @Author aiuiot
+ * @Author o0u0o
  * @Date 2020/5/12 10:54 下午
  * @Descripton: 启动类
  *
