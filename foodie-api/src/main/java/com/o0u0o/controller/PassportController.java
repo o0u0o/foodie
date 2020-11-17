@@ -7,6 +7,7 @@ import com.o0u0o.utils.CookieUtils;
 import com.o0u0o.utils.IJsonResult;
 import com.o0u0o.utils.JsonUtils;
 import com.o0u0o.utils.MD5Utils;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author o0u0o
  * @date 2020/10/25 1:38 下午
  */
+@Api(value = "注册登录", tags = {"用于注册登录的相关接口"})
 @RestController
 @RequestMapping("passport")
 public class PassportController {
@@ -27,11 +29,7 @@ public class PassportController {
     @Autowired
     private UserService userService;
 
-    /**
-     * 判断用户名是否存在
-     * @param username 用户名
-     * @return
-     */
+    @ApiOperation(value = "用户是否存在", notes = "用户是否存在", httpMethod = "GET")
     @GetMapping("/usernameIsExist")
     public IJsonResult usernameIsExist(@RequestParam String username){
 
