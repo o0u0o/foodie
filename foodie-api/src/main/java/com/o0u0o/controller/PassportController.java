@@ -6,6 +6,7 @@ import com.o0u0o.service.UserService;
 import com.o0u0o.utils.CookieUtils;
 import com.o0u0o.utils.IJsonResult;
 import com.o0u0o.utils.JsonUtils;
+import com.o0u0o.utils.MD5Utils;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,22 +50,9 @@ public class PassportController {
         return IJsonResult.ok();
     }
 
-    @ApiOperation(value = "用户登陆", notes = "用户登陆", httpMethod = "POST")
-    @PostMapping("/login")
-    public IJsonResult login(){
-        return null;
-    }
-
-    /**
-     * 用户注册
-     * @param userBO
-     * @param request
-     * @param response
-     * @return
-     */
     @ApiOperation(value = "用户注册", notes = "用户注册", httpMethod = "POST")
     @PostMapping("/regist")
-    public IJsonResult regist(@RequestBody UserBO userBO,
+    public IJsonResult register(@RequestBody UserBO userBO,
                               HttpServletRequest request,
                               HttpServletResponse response){
         String username = userBO.getUsername();
@@ -103,6 +91,49 @@ public class PassportController {
         //TODO 同步购物车数据
         return IJsonResult.ok(userResult);
     }
+
+    @ApiOperation(value = "用户登陆", notes = "用户登陆", httpMethod = "POST")
+    @PostMapping("/login")
+    public IJsonResult login(@RequestBody UserBO userBO,
+                             HttpServletRequest request,
+                             HttpServletResponse response) throws Exception {
+        String username = userBO.getUsername();
+        String password = userBO.getPassword();
+
+        //0.判断用户名密码必须不能为空
+        if (StringUtils.isBlank(username) || StringUtils.isBlank(password)){
+            return IJsonResult.errorMsg("用户名或密码为空");
+        }
+
+        //1、实现登录
+        Users userResult = userService.queryUserForLogin(username, MD5Utils.getMD5Str(password));
+
+        if (userResult == null){
+            return IJsonResult.errorMsg("用户名或密码不正确");
+        }
+
+        userResult = setNullProperty(userResult);
+
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(userResult), true);
+        // TODO 生成用户token，存入redis会话
+        // TODO 同步购物车数据
+        return IJsonResult.ok(userResult);
+    }
+
+    @ApiOperation(value = "用户退出登录", notes = "用户退出登录", httpMethod = "POST")
+    @PostMapping("/logout")
+    public IJsonResult logout(@RequestParam String userId,
+                              HttpServletRequest request,
+                              HttpServletResponse response){
+        //清除用户相关信息的cookie
+        CookieUtils.deleteCookie(request, response, "user");
+
+        //TODO 用户退出登录，需要清空购物车
+        //TODO 分布式会话中需要清除用户数据
+        return IJsonResult.ok();
+    }
+
+
 
 
     //=========== PRIVATE ===========
