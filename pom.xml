@@ -47,6 +47,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
+            <!--  排除调spring自带的日志框架   -->
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
