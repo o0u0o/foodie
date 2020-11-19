@@ -136,7 +136,6 @@ public class PassportController {
 
 
     //=========== PRIVATE ===========
-
     /**
      * 敏感信息置空
      * @param userResult

@@ -7,8 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.security.acl.LastOwnerException;
-
 /**
  * 服务日志的切面
  * 1.需要在pom文件引入aop的依赖方可使用@Aspect注解
@@ -45,7 +43,9 @@ public class ServiceLogAspect {
      */
     @Around("execution(* com.o0u0o.service.impl..*.*(..))")
     public Object recordTimeLog(ProceedingJoinPoint joinPoint) throws Throwable {
-        log.info("============ 开始执行 {}.{} ============",
+        log.info("==============================================");
+        log.info("=================== 开始执行 ===================");
+        log.info("============ 执行方法: {}.{} ",
                 joinPoint.getTarget().getClass(),
                 joinPoint.getSignature().getName());
         //记录开始时间
@@ -61,11 +61,20 @@ public class ServiceLogAspect {
         long takeTime = end - begin;
 
         if (takeTime > 3000){
-            log.error("============== 执行结束，耗时:{} 毫秒 =============", takeTime);
+            log.error("============== 耗时:{} 毫秒 ", takeTime);
+            log.error("=================== 执行结束 ===================");
+            log.error("==============================================");
+
         } else if (takeTime > 2000){
-            log.warn("============== 执行结束，耗时:{} 毫秒 =============", takeTime);
+            log.warn("============== 耗时:{} 毫秒 =============", takeTime);
+            log.warn("=================== 执行结束 ===================");
+            log.warn("==============================================");
+
         }else {
-            log.info("============== 执行结束，耗时:{} 毫秒 =============", takeTime);
+            log.info("============== 耗时:{} 毫秒 =============", takeTime);
+            log.info("=================== 执行结束 ===================");
+            log.info("==============================================");
+
         }
         return result;
     }

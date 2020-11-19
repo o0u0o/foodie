@@ -8,4 +8,5 @@ spring:
 
 mybatis:
   configuration:
+    #MyBatis控制台日志输出实现
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
