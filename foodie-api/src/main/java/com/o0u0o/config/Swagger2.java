@@ -16,17 +16,20 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
  * @author o0u0o
  * @date 2020/10/27 10:24 上午
  */
+
 @Configuration
+//开始swagger配置
 @EnableSwagger2
 public class Swagger2 {
 
     /**
-     * 配置swagger2 核型配置 docket
+     * 配置swagger2 核心配置 docket
      * @return
      */
     @Bean
     public Docket createRestApi(){
-        return new Docket(DocumentationType.SWAGGER_2) //指定API类型为swagger2
+        //指定API类型为swagger2
+        return new Docket(DocumentationType.SWAGGER_2)
                 //用于定义api文档汇总信息
                 .apiInfo(apiInfo())
                 .select()
@@ -44,7 +47,7 @@ public class Swagger2 {
                 .contact(new Contact("o0u0o",
                         "https://www.o0u0o.com",
                         "jobs@techgeng.com"))   //联系人信息
-                .description("转为天天吃货提供的API文档")  //详细描述
+                .description("专为天天吃货提供的API文档")  //详细描述
                 .version("1.0.1")   //文档版本号
                 .termsOfServiceUrl("https://www.o0u0o.com") //网站地址
                 .build();

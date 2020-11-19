@@ -6,12 +6,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.Mapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import springfox.documentation.annotations.ApiIgnore;
 
 /**
  * @Author aiuiot
  * @Date 2020/5/24 5:38 下午
  * @Descripton:  用户测试
  **/
+@ApiIgnore
 @RestController
 public class StuFooController {
 

@@ -2,6 +2,8 @@ package com.o0u0o.utils;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @Description: 自定义响应数据结构
@@ -17,18 +19,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author mac
  * @date 2020/10/26 2:39 下午
  */
+@ApiModel(value = "响应结果")
 public class IJsonResult {
 
     // 定义jackson对象
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    // 响应业务状态
+    @ApiModelProperty(value="响应状态")
     private Integer status;
 
-    // 响应消息
+
+    @ApiModelProperty(value="响应消息")
     private String msg;
 
-    // 响应中的数据
+    @ApiModelProperty(value="响应数据")
     private Object data;
 
     @JsonIgnore
