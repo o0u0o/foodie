@@ -33,4 +33,5 @@ public class CarouselServiceImpl implements CarouselService {
         List<Carousel> result = carouselMapper.selectByExample(example);
         return result;
     }
+
 }
