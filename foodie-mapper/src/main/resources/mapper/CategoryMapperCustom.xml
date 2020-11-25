@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.o0u0o.mapper.CategoryMapperCustom">
-  
-  <resultMap id="myCategoryVO" type="com.o0u0o.pojo.vo.CategoryVO">
+
+    <resultMap id="myCategoryVO" type="com.o0u0o.pojo.vo.CategoryVO">
     <id column="id" jdbcType="INTEGER" property="id" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="type" jdbcType="INTEGER" property="type" />
@@ -21,8 +21,23 @@
     </collection>
 
   </resultMap>
-  
-  <select id="getSubCatList" resultMap="myCategoryVO" parameterType="int">
+
+    <resultMap id="myNewItemsVO" type="com.o0u0o.pojo.vo.NewItemsVO">
+        <id column="rootCatId" jdbcType="INTEGER" property="rootCatId" />
+        <result column="rootCatName" jdbcType="VARCHAR" property="rootCatName" />
+        <result column="slogan" jdbcType="VARCHAR" property="slogan" />
+        <result column="catImage" jdbcType="VARCHAR" property="catImage" />
+        <result column="bgColor" jdbcType="VARCHAR" property="bgColor" />
+
+        <collection property="simpleItemList" ofType="com.o0u0o.pojo.vo.SimpleItemVO" >
+            <id column="itemId" jdbcType="VARCHAR" property="itemId" />
+            <result column="itemName" jdbcType="VARCHAR" property="itemName" />
+            <result column="itemUrl" jdbcType="VARCHAR" property="itemUrl" />
+        </collection>
+
+    </resultMap>
+
+    <select id="getSubCatList" resultMap="myCategoryVO" parameterType="int">
     SELECT
         f.id as id,
         f.`name` as `name`,
@@ -41,5 +56,34 @@
     WHERE
         f.father_id = #{rootCatId,jdbcType=INTEGER}
   </select>
+
+    <select id="getSixNewItemsLazy" resultMap="myNewItemsVO" parameterType="Map">
+        SELECT
+                f.id as rootCatId,
+                f.`name` as rootCatName,
+                f.slogan as slogan,
+                f.cat_image as catImage,
+                f.bg_color as bgColor,
+                i.id as itemId,
+                i.item_name as itemName,
+                ii.url as itemUrl,
+                i.created_time as createdTime
+        FROM
+                category f
+        LEFT join items i ON f.id = i.root_cat_id
+        LEFT JOIN items_img ii ON i.id = ii.item_id
+        WHERE
+                f.type = 1
+        AND
+                i.root_cat_id = #{paramsMap.rootCatId, jdbcType=INTEGER}
+        AND
+                ii.is_main = 1
+        ORDER BY
+                i.created_time
+                DESC
+        LIMIT 0,6
+    </select>
+
+
 
 </mapper>
