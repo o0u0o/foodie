@@ -6,6 +6,7 @@ import com.o0u0o.pojo.ItemsParam;
 import com.o0u0o.pojo.ItemsSpec;
 import com.o0u0o.pojo.vo.CommentLevelCountsVO;
 import com.o0u0o.pojo.vo.ItemInfoVO;
+import com.o0u0o.pojo.vo.ShopCartVO;
 import com.o0u0o.service.ItemService;
 import com.o0u0o.utils.IJsonResult;
 import com.o0u0o.utils.PagedGridResult;
@@ -127,5 +128,17 @@ public class ItemsController {
 
         PagedGridResult gridResult = itemService.searchItems(catId, sort, page, pageSize);
         return IJsonResult.ok(gridResult);
+    }
+
+    @ApiOperation(value = "根据商品规格ids查找最新的商品数据",
+            notes = "根据商品规格ids查找最新的商品数据(用于用户长时间未登录网站，刷新购物车中的数据（主要是商品价格）类似于京东淘宝")
+    @GetMapping("/refresh")
+    public IJsonResult refresh(@ApiParam(name = "itemSpecIds", value = "拼接的规格ids", required = true, example = "1001,1003,1005")
+                               @RequestParam String itemSpecIds){
+        if (StringUtils.isBlank(itemSpecIds)){
+            return IJsonResult.ok();
+        }
+        List<ShopCartVO> shopCartVOList = itemService.queryItemsBySpecIds(itemSpecIds);
+        return IJsonResult.ok(shopCartVOList);
     }
 }
