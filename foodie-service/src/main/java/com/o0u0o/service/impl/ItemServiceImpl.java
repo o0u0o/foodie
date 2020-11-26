@@ -1,11 +1,14 @@
 package com.o0u0o.service.impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.o0u0o.enums.CommentLevel;
 import com.o0u0o.mapper.*;
 import com.o0u0o.pojo.*;
 import com.o0u0o.pojo.vo.CommentLevelCountsVO;
 import com.o0u0o.pojo.vo.ItemCommentVO;
 import com.o0u0o.service.ItemService;
+import com.o0u0o.utils.PagedGridResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -97,12 +100,15 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional(propagation = Propagation.SUPPORTS)
     @Override
-    public List<ItemCommentVO> queryPagedComments(String itemId, Integer level) {
+    public PagedGridResult queryPagedComments(String itemId, Integer level, Integer pageNum, Integer pageSize) {
         Map<String, Object> map = new HashMap<>();
         map.put("itemId", itemId);
         map.put("level", level);
 
-        return itemsMapperCustom.queryItemComments(map);
+        PageHelper.startPage(pageNum, pageSize);
+        List<ItemCommentVO> list = itemsMapperCustom.queryItemComments(map);
+
+        return setterPagedGrid(list, pageNum);
     }
 
     /**
@@ -119,5 +125,21 @@ public class ItemServiceImpl implements ItemService {
             condition.setCommentLevel(level);
         }
         return itemsCommentsMapper.selectCount(condition);
+    }
+
+    /**
+     * 设置额外分页
+     * @param list
+     * @param pageNum
+     * @return
+     */
+    private PagedGridResult  setterPagedGrid(List<?> list,  Integer pageNum){
+        PageInfo<?> pageList = new PageInfo<>(list);
+        PagedGridResult grid = new PagedGridResult();
+        grid.setPage(pageNum);
+        grid.setRows(list);
+        grid.setTotal(pageList.getPages());
+        grid.setRecords(pageList.getTotal());
+        return grid;
     }
 }
