@@ -5,7 +5,6 @@ import com.o0u0o.pojo.ItemsImg;
 import com.o0u0o.pojo.ItemsParam;
 import com.o0u0o.pojo.ItemsSpec;
 import com.o0u0o.pojo.vo.CommentLevelCountsVO;
-import com.o0u0o.pojo.vo.ItemCommentVO;
 import com.o0u0o.utils.PagedGridResult;
 
 import java.util.List;
