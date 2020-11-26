@@ -20,6 +20,85 @@
     <if test="paramsMap.level != null and  paramsMap.level !='' ">
       AND ic.comment_level = #{paramsMap.level,jdbcType=INTEGER}
     </if>
-
   </select>
+
+    <!-- 搜索商品 展示规格的折扣最低价 -->
+    <select id="searchItems" parameterType="Map" resultType="com.o0u0o.pojo.vo.SearchItemsVO">
+        SELECT
+            i.id as itemId,
+            i.item_name as itemName,
+            i.sell_counts as sellCounts,
+            ii.url as imgUrl,
+            tempSpec.price_discount as price
+        FROM
+            items i
+        LEFT JOIN
+            items_img ii
+        ON
+            i.id = ii.item_id
+        LEFT JOIN
+            (SELECT item_id, MIN(price_discount) as price_discount FROM items_spec GROUP BY item_id) tempSpec
+        ON
+            i.id = tempSpec.item_id
+        WHERE
+            ii.is_main = 1
+            <if test="paramsMap.keywords !=null and paramsMap.keywords != ''">
+                AND i.item_name like '%${paramsMap.keywords}%'
+            </if>
+            <!--   使用choose标签进行多条件判断
+            排序规则：
+             k: 默认-根据名称排序
+             c: 根据销量 &quot; 单引号进行转义 paramsMap.sort == 'c'
+             p: 根据价格
+            -->
+            order by
+            <choose>
+                <when test="paramsMap.sort == &quot;c&quot; ">
+                    i.sell_counts desc
+                </when>
+                <when test="paramsMap.sort == &quot;p&quot; ">
+                    tempSpec.price_discount asc
+                </when>
+                <otherwise>
+                    i.item_name asc
+                </otherwise>
+            </choose>
+    </select>
+
+    <!--  根据三级分类ID进行搜索  -->
+    <select id="searchItemsByThirdCat" parameterType="Map" resultType="com.o0u0o.pojo.vo.SearchItemsVO">
+        SELECT
+        i.id as itemId,
+        i.item_name as itemName,
+        i.sell_counts as sellCounts,
+        ii.url as imgUrl,
+        tempSpec.price_discount as price
+        FROM
+        items i
+        LEFT JOIN
+        items_img ii
+        ON
+        i.id = ii.item_id
+        LEFT JOIN
+        (SELECT item_id, MIN(price_discount) as price_discount FROM items_spec GROUP BY item_id) tempSpec
+        ON
+        i.id = tempSpec.item_id
+        WHERE
+        ii.is_main = 1
+        AND
+        i.cat_id = #{paramsMap.catId,jdbcType=INTEGER}
+        order by
+        <choose>
+            <when test="paramsMap.sort == &quot;c&quot; ">
+                i.sell_counts desc
+            </when>
+            <when test="paramsMap.sort == &quot;p&quot; ">
+                tempSpec.price_discount asc
+            </when>
+            <otherwise>
+                i.item_name asc
+            </otherwise>
+        </choose>
+    </select>
+
 </mapper>

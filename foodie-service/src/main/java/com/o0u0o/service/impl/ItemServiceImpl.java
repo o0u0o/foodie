@@ -7,6 +7,7 @@ import com.o0u0o.mapper.*;
 import com.o0u0o.pojo.*;
 import com.o0u0o.pojo.vo.CommentLevelCountsVO;
 import com.o0u0o.pojo.vo.ItemCommentVO;
+import com.o0u0o.pojo.vo.SearchItemsVO;
 import com.o0u0o.service.ItemService;
 import com.o0u0o.utils.DesensitizationUtil;
 import com.o0u0o.utils.PagedGridResult;
@@ -135,6 +136,32 @@ public class ItemServiceImpl implements ItemService {
         return itemsCommentsMapper.selectCount(condition);
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public PagedGridResult searchItems(String keywords, String sort, Integer pageNum, Integer pageSize) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("keywords", keywords);
+        map.put("sort", sort);
+
+        PageHelper.startPage(pageNum, pageSize);
+        List<SearchItemsVO> searchItemsVOList = itemsMapperCustom.searchItems(map);
+
+        return setterPagedGrid(searchItemsVOList, pageNum);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public PagedGridResult searchItems(Integer catId, String sort, Integer pageNum, Integer pageSize) {
+        Map<String, Object> map = new HashMap<>();
+        map.put("catId", catId);
+        map.put("sort", sort);
+
+        PageHelper.startPage(pageNum, pageSize);
+        List<SearchItemsVO> searchItemsVOList = itemsMapperCustom.searchItemsByThirdCat(map);
+
+        return setterPagedGrid(searchItemsVOList, pageNum);
+    }
+
     /**
      * 设置额外分页
      * @param list
@@ -150,4 +177,6 @@ public class ItemServiceImpl implements ItemService {
         grid.setRecords(pageList.getTotal());
         return grid;
     }
+
+
 }
