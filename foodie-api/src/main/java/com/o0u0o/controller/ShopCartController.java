@@ -32,7 +32,7 @@ public class ShopCartController {
     final static Logger logger  = LoggerFactory.getLogger("ShopCartController");
 
     @ApiOperation(value = "添加商品到购物车", notes = "添加商品到购物车")
-    @PostMapping
+    @PostMapping("/add")
     public IJsonResult add(@RequestParam String userId,
                            @RequestBody ShopCartBO shopCartBO,
                            HttpServletRequest request,
@@ -46,5 +46,19 @@ public class ShopCartController {
         return IJsonResult.ok();
     }
 
+    @ApiOperation(value = "从购物车中删除商品", notes = "从购物车中删除商品")
+    @PostMapping("/del")
+    public IJsonResult del(@RequestParam String userId,
+                           @RequestParam String itemSpecId,
+                           HttpServletRequest request,
+                           HttpServletResponse response){
+        if (StringUtils.isBlank(userId) || StringUtils.isBlank(itemSpecId)){
+            return IJsonResult.errorMsg("参数不能为空");
+        }
+
+
+        //TODO 用户在页面删除购物车中的商品数据，如果此时用户已经登录，则需要同步删除后端购物车
+        return IJsonResult.ok();
+    }
 
 }
