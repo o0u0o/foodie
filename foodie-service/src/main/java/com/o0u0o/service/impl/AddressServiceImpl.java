@@ -1,5 +1,6 @@
 package com.o0u0o.service.impl;
 
+import com.o0u0o.enums.YesOrNo;
 import com.o0u0o.mapper.UserAddressMapper;
 import com.o0u0o.pojo.UserAddress;
 import com.o0u0o.pojo.bo.AddressBO;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 地址服务接口实现
@@ -83,5 +85,28 @@ public class AddressServiceImpl implements AddressService {
         userAddress.setUserId(userId);
 
         userAddressMapper.delete(userAddress);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void updateUserAddressToBeDefault(String userId, String addressId) {
+        //1.查找默认地址 设置为不默认
+        UserAddress queryAddress = new UserAddress();
+        queryAddress.setUserId(userId);
+        queryAddress.setIsDefault(YesOrNo.YES.type);
+        List<UserAddress> userAddressList = userAddressMapper.select(queryAddress);
+        userAddressList.stream().map(e->{
+            e.setIsDefault(YesOrNo.NO.type);
+            userAddressMapper.updateByPrimaryKeySelective(e);
+            return e;
+        }).collect(Collectors.toList());
+
+        //2、根据地址ID修改为默认地址
+        UserAddress defaultAddress = new UserAddress();
+        defaultAddress.setId(addressId);
+        defaultAddress.setUserId(userId);
+        defaultAddress.setIsDefault(YesOrNo.YES.type);
+
+        userAddressMapper.updateByPrimaryKeySelective(defaultAddress);
     }
 }

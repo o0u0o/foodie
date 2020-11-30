@@ -48,6 +48,46 @@ public class AddressController {
         return IJsonResult.ok();
     }
 
+    @ApiOperation(value = "用户修改地址", notes = "用户修改地址", httpMethod = "POST")
+    @PostMapping("/update")
+    public IJsonResult update(@RequestBody AddressBO addressBO){
+        if (StringUtils.isBlank(addressBO.getAddressId())){
+            return IJsonResult.errorMsg("修改地址错误：addressId不能为空");
+        }
+
+        IJsonResult checkRes = checkAddress(addressBO);
+        if (checkRes.getStatus() != 200){
+            return checkRes;
+        }
+
+        addressService.updateUserAddress(addressBO);
+        return IJsonResult.ok();
+    }
+
+    @ApiOperation(value = "用户删除地址", notes = "用户删除地址", httpMethod = "POST")
+    @PostMapping("/delete")
+    public IJsonResult delete(@RequestParam(required = true) String userId,
+                              @RequestParam(required = true) String addressId){
+        if (StringUtils.isBlank(userId) || StringUtils.isBlank(addressId)){
+            return IJsonResult.errorMsg("");
+        }
+
+        addressService.deleteUserAddress(userId, addressId);
+        return IJsonResult.ok();
+    }
+
+    @ApiOperation(value = "用户设置默认地址", notes = "用户设置默认地址", httpMethod = "POST")
+    @PostMapping("/setDefault")
+    public IJsonResult setDefault(@RequestParam String userId,
+                                  @RequestParam String addressId){
+        if (StringUtils.isBlank(userId) || StringUtils.isBlank(addressId)){
+            return IJsonResult.errorMsg("");
+        }
+
+        addressService.updateUserAddressToBeDefault(userId, addressId);
+        return IJsonResult.ok();
+    }
+
     private IJsonResult checkAddress(AddressBO addressBO){
         String receiver = addressBO.getReceiver();
         if (StringUtils.isBlank(receiver)){
