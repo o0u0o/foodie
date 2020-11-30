@@ -7,14 +7,19 @@ package com.o0u0o.pojo.bo;
  */
 public class SubmitOrderBO {
 
+    /** 买家ID */
     private String userId;
 
+    /** 规格的ids */
     private String itemSpecIds;
 
+    /** 地址ID */
     private String addressId;
 
+    /** 支付方式 */
     private Integer payMethod;
 
+    /** 买家留言 */
     private String leftMsg;
 
     public String getUserId() {

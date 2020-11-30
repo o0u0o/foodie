@@ -3,6 +3,7 @@ package com.o0u0o.service.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.o0u0o.enums.CommentLevel;
+import com.o0u0o.enums.YesOrNo;
 import com.o0u0o.mapper.*;
 import com.o0u0o.pojo.*;
 import com.o0u0o.pojo.vo.CommentLevelCountsVO;
@@ -168,6 +169,50 @@ public class ItemServiceImpl implements ItemService {
         List<String> specIdsList = new ArrayList<>();
         Collections.addAll(specIdsList, ids);
         return itemsMapperCustom.queryItemsBySpecIds(specIdsList);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public ItemsSpec queryItemSpecById(String specId){
+        return itemsSpecMapper.selectByPrimaryKey(specId);
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public String queryItemMainImgById(String itemId) {
+        ItemsImg itemsImg = new ItemsImg();
+        itemsImg.setItemId(itemId);
+        itemsImg.setIsMain(YesOrNo.YES.type);
+        ItemsImg result = itemsImgMapper.selectOne(itemsImg);
+
+        return result != null ? result.getUrl() : "";
+    }
+
+    /**
+     * 扣除库存 有可能会出现超卖问题
+     *  处理方式：
+     * 1、 加同步锁(不推荐) 使用synchronized关键字 单体可以使用，集群无效
+     * @param specId
+     * @param buyCounts
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void decreaseItemSpecStock(String specId, int buyCounts) {
+        //synchronized 不推荐，集群下无用，性能低下
+        //锁数据库:不推荐，会导致数据库性能低下
+        //分布式锁: zookeeper  redis
+
+//        lockUtil.getLock(); -- 加锁
+        //1、查询库存
+
+        //2、判断库存，是否能够减少到0以下
+
+//        lockUtil.unLock(); -- 解锁
+
+        int result = itemsMapperCustom.decreaseItemSpecStock(specId, buyCounts);
+        if (result != 1){
+            throw new RuntimeException("订单创建失败，原因：库存不足");
+        }
     }
 
     /**
