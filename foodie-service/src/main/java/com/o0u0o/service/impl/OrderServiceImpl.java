@@ -7,6 +7,7 @@ import com.o0u0o.mapper.OrderStatusMapper;
 import com.o0u0o.mapper.OrdersMapper;
 import com.o0u0o.pojo.*;
 import com.o0u0o.pojo.bo.SubmitOrderBO;
+import com.o0u0o.pojo.vo.MerchantOrdersVO;
 import com.o0u0o.pojo.vo.OrderVO;
 import com.o0u0o.pojo.vo.ShopCartVO;
 import com.o0u0o.service.AddressService;
@@ -136,9 +137,18 @@ public class OrderServiceImpl implements OrderService {
         waitPayOrderStatus.setCreatedTime(new Date());
         orderStatusMapper.insert(waitPayOrderStatus);
 
+        // 4. 构建商户订单，用于传给支付中心
+        MerchantOrdersVO merchantOrdersVO = new MerchantOrdersVO();
+        merchantOrdersVO.setMerchantOrderId(orderId);
+        merchantOrdersVO.setMerchantUserId(userId);
+        merchantOrdersVO.setAmount(realPayAmount + postAmount);
+        merchantOrdersVO.setPayMethod(payMethod);
+//        merchantOrdersVO.setReturnUrl();
+
+        //5.构建自定义订单vo
         OrderVO orderVO = new OrderVO();
         orderVO.setOrderId(orderId);
-//        orderVO.setMerchantOrdersVO();
+        orderVO.setMerchantOrdersVO(merchantOrdersVO);
 
         return orderVO;
     }

@@ -14,8 +14,8 @@ public interface OrderService {
 
     /**
      * 修改订单状态
-     * @param orderId
-     * @param orderStatus
+     * @param orderId 订单号
+     * @param orderStatus 订单状态
      */
     public void updateOrderStatus(String orderId, Integer orderStatus);
 }

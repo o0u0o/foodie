@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="foodie-service" />
         <module name="foodie-pojo" />
+        <module name="foodie-payment" />
         <module name="foodie-common" />
         <module name="foodie-api" />
         <module name="foodie-mapper" />
@@ -19,6 +20,7 @@
       <module name="foodie-api" options="-parameters" />
       <module name="foodie-common" options="-parameters" />
       <module name="foodie-mapper" options="-parameters" />
+      <module name="foodie-payment" options="-parameters" />
       <module name="foodie-pojo" options="-parameters" />
       <module name="foodie-service" options="-parameters" />
     </option>

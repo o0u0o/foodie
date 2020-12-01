@@ -25,6 +25,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("file:/workspaces/images");
     }
 
+    /**
+     * 将restTemplate注解成一个bean 被容器扫描
+     * @param builder
+     * @return
+     */
     @Bean
     public RestTemplate restTemplate(RestTemplateBuilder builder){
         return builder.build();
