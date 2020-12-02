@@ -2,6 +2,7 @@ package com.o0u0o.controller;
 
 import com.o0u0o.enums.OrderStatusEnum;
 import com.o0u0o.enums.PayMethod;
+import com.o0u0o.pojo.OrderStatus;
 import com.o0u0o.pojo.bo.SubmitOrderBO;
 import com.o0u0o.pojo.vo.MerchantOrdersVO;
 import com.o0u0o.pojo.vo.OrderVO;
@@ -93,9 +94,15 @@ public class OrdersController extends BaseController {
      * @param merchantOrderId
      * @return
      */
-    @PostMapping("notifyMerchantOrderPaid")
+    @PostMapping("/notifyMerchantOrderPaid")
     public Integer notifyMerchantOrderPaid(String merchantOrderId){
         orderService.updateOrderStatus(merchantOrderId, OrderStatusEnum.WAIT_DELIVER.type);
         return HttpStatus.OK.value();
+    }
+
+    @PostMapping("/getPaidOrderInfo")
+    public IJsonResult getPaidOrderInfo(String orderId){
+        OrderStatus orderStatus = orderService.queryOrderStatusInfo(orderId);
+        return IJsonResult.ok(orderStatus);
     }
 }
