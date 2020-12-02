@@ -100,6 +100,11 @@ public class OrdersController extends BaseController {
         return HttpStatus.OK.value();
     }
 
+    /**
+     * 查询支付订单信息
+     * @param orderId 订单号
+     * @return
+     */
     @PostMapping("/getPaidOrderInfo")
     public IJsonResult getPaidOrderInfo(String orderId){
         OrderStatus orderStatus = orderService.queryOrderStatusInfo(orderId);

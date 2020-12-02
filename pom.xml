@@ -169,6 +169,13 @@
             <artifactId>fastjson</artifactId>
             <version>1.2.73</version>
         </dependency>
+
+        <!-- redisson分布式锁  -->
+        <dependency>
+            <groupId>org.redisson</groupId>
+            <artifactId>redisson-spring-boot-starter</artifactId>
+            <version>3.14.0</version>
+        </dependency>
     </dependencies>
 
 </project>

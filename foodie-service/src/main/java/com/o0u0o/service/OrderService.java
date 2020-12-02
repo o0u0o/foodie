@@ -22,7 +22,7 @@ public interface OrderService {
 
     /**
      * 查询订单状态
-     * @param orderId
+     * @param orderId 订单号
      * @return
      */
     public OrderStatus queryOrderStatusInfo(String orderId);
