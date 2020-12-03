@@ -13,13 +13,18 @@ import com.o0u0o.pojo.vo.ShopCartVO;
 import com.o0u0o.service.AddressService;
 import com.o0u0o.service.ItemService;
 import com.o0u0o.service.OrderService;
+import com.o0u0o.utils.DateUtil;
 import org.n3r.idworker.Sid;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author mac
@@ -27,6 +32,9 @@ import java.util.Date;
  */
 @Service
 public class OrderServiceImpl implements OrderService {
+
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Autowired
     private OrdersMapper ordersMapper;
@@ -49,6 +57,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(propagation = Propagation.REQUIRED)
     @Override
     public OrderVO createOrder(SubmitOrderBO submitOrderBO) {
+
 
         String userId = submitOrderBO.getUserId();
         String addressId = submitOrderBO.getAddressId();
@@ -123,6 +132,7 @@ public class OrderServiceImpl implements OrderService {
 
             //2.4 在用户提交订单后，规格表中需要扣除库存
             itemService.decreaseItemSpecStock(itemSpecId, buyCounts);
+
         }
 
         newOrder.setTotalAmount(totalAmount);
@@ -169,5 +179,37 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderStatus queryOrderStatusInfo(String orderId) {
         return orderStatusMapper.selectByPrimaryKey(orderId);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public void closeOrder() {
+        //1、查询所有未付款订单，判断时间是否超时(1天)，超时则关闭交易
+        OrderStatus queryOrder = new OrderStatus();
+        queryOrder.setOrderStatus(OrderStatusEnum.WAIT_PAY.type);
+        List<OrderStatus> orderStatusList = orderStatusMapper.select(queryOrder);
+        for (OrderStatus orderStatus : orderStatusList) {
+            //获得订单创建时间
+            Date createdTime = orderStatus.getCreatedTime();
+            //和当前时间进行对比
+            int days = DateUtil.daysBetween(createdTime, new Date());
+            if (days >= 1){
+                //超过一天，关闭订单
+                doCloseOrder(orderStatus.getOrderId());
+            }
+
+        }
+    }
+
+    /**
+     * 关闭订单
+     * @param orderId
+     */
+    @Transactional(propagation = Propagation.REQUIRED)
+    void doCloseOrder(String orderId){
+        OrderStatus close = new OrderStatus();
+        close.setOrderStatus(OrderStatusEnum.CLOSE.type);
+        close.setCloseTime(new Date());
+        int i = orderStatusMapper.updateByPrimaryKeySelective(close);
     }
 }

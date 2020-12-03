@@ -220,7 +220,7 @@ public class PaymentController {
 		//		+ "\"product_code\":\"FAST_INSTANT_TRADE_PAY\"}");
 		//请求参数可查阅【电脑网站支付的API文档-alipay.trade.page.pay-请求参数】章节
 
-		//请求
+		//请求到支付宝
 		String alipayForm = "";
 		try {
 			alipayForm = alipayClient.pageExecute(alipayRequest).getBody();

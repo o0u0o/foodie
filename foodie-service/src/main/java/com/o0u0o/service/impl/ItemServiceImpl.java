@@ -13,6 +13,8 @@ import com.o0u0o.pojo.vo.ShopCartVO;
 import com.o0u0o.service.ItemService;
 import com.o0u0o.utils.DesensitizationUtil;
 import com.o0u0o.utils.PagedGridResult;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import tk.mybatis.mapper.entity.Example;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +31,9 @@ import java.util.stream.Collectors;
  */
 @Service
 public class ItemServiceImpl implements ItemService {
+
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Autowired
     private ItemsMapper itemsMapper;
@@ -201,15 +207,16 @@ public class ItemServiceImpl implements ItemService {
         //synchronized 不推荐，集群下无用，性能低下
         //锁数据库:不推荐，会导致数据库性能低下
         //分布式锁: zookeeper  redis
-
+        RLock rLock = redissonClient.getLock("decreaseItemSpecStock");
+        rLock.lock(30, TimeUnit.SECONDS);
 //        lockUtil.getLock(); -- 加锁
         //1、查询库存
 
         //2、判断库存，是否能够减少到0以下
 
 //        lockUtil.unLock(); -- 解锁
-
         int result = itemsMapperCustom.decreaseItemSpecStock(specId, buyCounts);
+        rLock.unlock();
         if (result != 1){
             throw new RuntimeException("订单创建失败，原因：库存不足");
         }
