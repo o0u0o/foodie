@@ -1,9 +1,8 @@
 package com.test;
 
 import com.o0u0o.Application;
-import com.o0u0o.service.StuService;
-import com.o0u0o.service.TestTransService;
-import com.o0u0o.service.impl.TestTransactionalServiceImpl;
+import com.o0u0o.service.shop.StuService;
+import com.o0u0o.service.shop.TestTransService;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;

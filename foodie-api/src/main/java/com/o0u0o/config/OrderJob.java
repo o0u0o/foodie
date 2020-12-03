@@ -1,6 +1,6 @@
 package com.o0u0o.config;
 
-import com.o0u0o.service.OrderService;
+import com.o0u0o.service.shop.OrderService;
 import com.o0u0o.utils.DateUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
