@@ -1,6 +1,7 @@
 package com.o0u0o.service.usercenter;
 
 import com.o0u0o.pojo.Users;
+import com.o0u0o.pojo.bo.center.CenterUserBO;
 
 public interface UserCenterService {
 
@@ -10,4 +11,11 @@ public interface UserCenterService {
      * @return
      */
     public Users queryUserInfo(String userId);
+
+    /**
+     * 修改用户信息
+     * @param userId
+     * @param centerUserBO
+     */
+    public Users updateUserInfo(String userId, CenterUserBO centerUserBO);
 }
