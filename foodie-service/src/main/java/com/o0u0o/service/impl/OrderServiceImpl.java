@@ -208,6 +208,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional(propagation = Propagation.REQUIRED)
     void doCloseOrder(String orderId){
         OrderStatus close = new OrderStatus();
+        close.setOrderId(orderId);
         close.setOrderStatus(OrderStatusEnum.CLOSE.type);
         close.setCloseTime(new Date());
         int i = orderStatusMapper.updateByPrimaryKeySelective(close);
