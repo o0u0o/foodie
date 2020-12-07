@@ -20,11 +20,11 @@ public class CenterUserBO {
 
     @NotBlank(message = "用户昵称不能为空")
     @Length(max = 12, message = "用户昵称不能超过12位")
-    @ApiModelProperty(value="用户昵称", name="nickname", example="杰森", required = false)
+    @ApiModelProperty(value="用户昵称", name="nickname", example="云云", required = false)
     private String nickname;
 
     @Length(max = 12, message = "用户真实姓名不能超过12位")
-    @ApiModelProperty(value="真实姓名", name="realname", example="杰森", required = false)
+    @ApiModelProperty(value="真实姓名", name="realname", example="岳云", required = false)
     private String realname;
 
     @Pattern(regexp = "^(((13[0-9]{1})|(15[0-9]{1})|(18[0-9]{1}))+\\d{8})$", message = "手机号格式不正确")
@@ -32,7 +32,7 @@ public class CenterUserBO {
     private String mobile;
 
     @Email
-    @ApiModelProperty(value="邮箱地址", name="email", example="imooc@imooc.com", required = false)
+    @ApiModelProperty(value="邮箱地址", name="email", example="jobs@techgeng.com", required = false)
     private String email;
 
     @Min(value = 0, message = "性别选择不正确")
