@@ -3,6 +3,7 @@ package com.o0u0o.controller.usercenter;
 import com.o0u0o.controller.shop.BaseController;
 import com.o0u0o.pojo.Users;
 import com.o0u0o.pojo.bo.center.CenterUserBO;
+import com.o0u0o.resource.FileUpload;
 import com.o0u0o.service.usercenter.UserCenterService;
 import com.o0u0o.utils.CookieUtils;
 import com.o0u0o.utils.IJsonResult;
@@ -39,14 +40,19 @@ public class CenterUserInfoController extends BaseController {
     @Autowired
     private UserCenterService userCenterService;
 
+    @Autowired
+    private FileUpload fileUpload;
+
     @ApiOperation(value = "用户头像修改", notes = "用户头像修改", httpMethod = "GET")
-    @PostMapping("/update")
+    @PostMapping("/upload")
     public IJsonResult update(@ApiParam(name = "userId", value = "用户ID", required = true)
                               @RequestParam String userId,
                               @ApiParam(name = "file", value = "用户头像", required = true)
-                              MultipartFile file){
+                              MultipartFile file,
+                              HttpServletRequest request, HttpServletResponse response){
         // 定义头像保存地址
-        String fileSpace = IMAGE_USER_FACE_LOCATION;
+//        String fileSpace = IMAGE_USER_FACE_LOCATION;
+        String fileSpace = fileUpload.getImageUserFaceLocation();
         // 在路径上为每一个用户增加一个userId 区分不同用户上传
         String uploadPathPrefix = File.separator + userId;
 
