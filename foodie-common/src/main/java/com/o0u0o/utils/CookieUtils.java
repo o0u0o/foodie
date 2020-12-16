@@ -16,6 +16,7 @@ import java.net.URLEncoder;
  * @date 2020/10/27 9:28 上午
  */
 public final class CookieUtils {
+
     final static Logger logger = LoggerFactory.getLogger(CookieUtils.class);
 
     /**
@@ -305,6 +306,4 @@ public final class CookieUtils {
         }
         return b;
     }
-
-
 }
