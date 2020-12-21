@@ -44,7 +44,7 @@ public class CenterUserInfoController extends BaseController {
     private FileUpload fileUpload;
 
     @ApiOperation(value = "用户头像修改", notes = "用户头像修改", httpMethod = "GET")
-    @PostMapping("/upload")
+    @PostMapping("/uploadFace")
     public IJsonResult update(@ApiParam(name = "userId", value = "用户ID", required = true)
                               @RequestParam String userId,
                               @ApiParam(name = "file", value = "用户头像", required = true)
