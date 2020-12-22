@@ -113,7 +113,7 @@ public class CenterUserInfoController extends BaseController {
                         fileOutputStream.close();
                     }
                 } catch (IOException e){
-
+                    e.printStackTrace();
                 }
             }
 
@@ -128,6 +128,8 @@ public class CenterUserInfoController extends BaseController {
 
         //更新用户头像到数据库
         Users userResult = userCenterService.updateUserFace(userId, finalUserFaceUrl);
+
+//        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO), true);
         // TODO 后续要改，增加令牌Token, 会整合进redis 实现分布式会话管理
 
         return IJsonResult.ok();
