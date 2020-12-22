@@ -6,6 +6,7 @@ import com.o0u0o.pojo.bo.center.CenterUserBO;
 import com.o0u0o.resource.FileUpload;
 import com.o0u0o.service.usercenter.UserCenterService;
 import com.o0u0o.utils.CookieUtils;
+import com.o0u0o.utils.DateUtil;
 import com.o0u0o.utils.IJsonResult;
 import com.o0u0o.utils.JsonUtils;
 import io.swagger.annotations.Api;
@@ -50,6 +51,9 @@ public class CenterUserInfoController extends BaseController {
                               @ApiParam(name = "file", value = "用户头像", required = true)
                               MultipartFile file,
                               HttpServletRequest request, HttpServletResponse response){
+
+        //防止黑客上传其他文件 如.sh .php 等
+
         // 定义头像保存地址
 //        String fileSpace = IMAGE_USER_FACE_LOCATION;
         String fileSpace = fileUpload.getImageUserFaceLocation();
@@ -70,12 +74,21 @@ public class CenterUserInfoController extends BaseController {
                 //获取文件的后缀名
                 String suffix = fileNameArr[fileNameArr.length - 1];
 
+                if (!suffix.equalsIgnoreCase("png") &&
+                        !suffix.equalsIgnoreCase("jpg") &&
+                        !suffix.equalsIgnoreCase("jpeg")){
+                    return IJsonResult.errorMsg("图片格式不正确！");
+                }
+
                 //  face-{userid}.png
                 // 文件名称重组 覆盖式上传 增量式：需要额外拼接当前时间
                 String newFileName = "face-" + userId + "." + suffix;
 
                 // 上传的头像最终保存的位置
                 String finalFacePath = fileSpace + uploadPathPrefix + File.separator + newFileName;
+
+                //用户提供给web服务访问的图片地址
+                uploadPathPrefix += ("/" + newFileName);
 
                 File outFile = new File(finalFacePath);
 
@@ -107,6 +120,15 @@ public class CenterUserInfoController extends BaseController {
         } else {
             return IJsonResult.errorMsg("文件不能为空");
         }
+        //获得图片服务地址
+        String imageServerUrl = fileUpload.getFileImageServerUrl();
+
+        //由于浏览器可能存在缓存，此处加上时间戳，保证及时更新
+        String finalUserFaceUrl = imageServerUrl  + uploadPathPrefix + "?t=" + DateUtil.getCurrentDateString(DateUtil.DATE_PATTERN);
+
+        //更新用户头像到数据库
+        Users userResult = userCenterService.updateUserFace(userId, finalUserFaceUrl);
+        // TODO 后续要改，增加令牌Token, 会整合进redis 实现分布式会话管理
 
         return IJsonResult.ok();
 
@@ -130,10 +152,12 @@ public class CenterUserInfoController extends BaseController {
         CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(userResult), true);
 
         // TODO 后续要改，增加令牌Token, 会整合进redis 实现分布式会话管理
-
         return IJsonResult.ok();
 
     }
+
+
+
 
     //=========== PRIVATE ===========
     private Map<String, String> getErrors(BindingResult result){

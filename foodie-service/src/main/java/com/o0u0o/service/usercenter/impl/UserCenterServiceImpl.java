@@ -46,4 +46,17 @@ public class UserCenterServiceImpl implements UserCenterService {
 
         return queryUserInfo(userId);
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    @Override
+    public Users updateUserFace(String userId, String faceUrl) {
+        Users updateUser = new Users();
+        updateUser.setId(userId);
+        updateUser.setFace(faceUrl);
+        updateUser.setUpdatedTime(new Date());
+
+        usersMapper.updateByPrimaryKeySelective(updateUser);
+
+        return queryUserInfo(userId);
+    }
 }

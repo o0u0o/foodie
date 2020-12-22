@@ -16,11 +16,21 @@ public class FileUpload {
 
     private String imageUserFaceLocation;
 
+    private String  fileImageServerUrl;
+
     public String getImageUserFaceLocation() {
         return imageUserFaceLocation;
     }
 
     public void setImageUserFaceLocation(String imageUserFaceLocation) {
         this.imageUserFaceLocation = imageUserFaceLocation;
+    }
+
+    public String getFileImageServerUrl() {
+        return fileImageServerUrl;
+    }
+
+    public void setFileImageServerUrl(String fileImageServerUrl) {
+        this.fileImageServerUrl = fileImageServerUrl;
     }
 }
