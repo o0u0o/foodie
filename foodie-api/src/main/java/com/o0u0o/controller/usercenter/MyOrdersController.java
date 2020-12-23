@@ -44,4 +44,21 @@ public class MyOrdersController {
         PagedGridResult gridResult = myOrdersService.queryMyOrders(userId, orderStatus, page, pageSize);
         return IJsonResult.ok(gridResult);
     }
+
+    /**
+     * 商家发货没有后端，所以这个接口仅仅用于模拟
+     * @param orderId 订单号
+     * @return
+     * @throws Exception
+     */
+    @ApiOperation(value = "商家发货", notes = "商家发货", httpMethod = "GET")
+    @GetMapping("/deliver")
+    public IJsonResult deliver(@ApiParam(name = "orderId", value = "订单ID", required = true)
+                               @RequestParam String orderId) throws Exception{
+        if (StringUtils.isBlank(orderId)){
+            return IJsonResult.errorMsg("订单ID不能为空");
+        }
+        myOrdersService.updateDeliverOrderStatus(orderId);
+        return IJsonResult.ok();
+    }
 }
