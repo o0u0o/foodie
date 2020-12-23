@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.o0u0o.mapper.OrdersMapperCustom">
+
+    <resultMap id="myOrdersVO" type="com.o0u0o.pojo.vo.MyOrdersVO">
+    <id column="orderId" jdbcType="VARCHAR" property="orderId" />
+    <result column="createdTime" jdbcType="DATE" property="createdTime" />
+    <result column="payMethod" jdbcType="INTEGER" property="payMethod" />
+    <result column="realPayAmount" jdbcType="INTEGER" property="realPayAmount" />
+    <result column="postAmount" jdbcType="INTEGER" property="postAmount" />
+    <result column="orderStatus" jdbcType="INTEGER" property="orderStatus" />
+    <collection property="subOrderItemVOList" ofType="com.o0u0o.pojo.vo.MySubOrderItemVO" >
+      <result column="itemId" jdbcType="VARCHAR" property="itemId" />
+      <result column="itemImg" jdbcType="VARCHAR" property="itemImg" />
+      <result column="itemName" jdbcType="VARCHAR" property="itemName" />
+      <result column="itemSpecName" jdbcType="VARCHAR" property="itemSpecName" />
+      <result column="buyCounts" jdbcType="INTEGER" property="buyCounts" />
+      <result column="price" jdbcType="INTEGER" property="price" />
+    </collection>
+
+    </resultMap>
+
+    <!-- 查询我的订单   -->
+    <select id="queryMyOrders" resultMap="myOrdersVO" parameterType="Map">
+        SELECT
+            od.id as orderId,
+            od.created_time as createdTime,
+            od.pay_method as payMethod,
+            od.real_pay_amount as realPayAmount,
+            od.post_amount as postAmount,
+            os.order_status as orderStatus,
+            oi.item_id as itemId,
+            oi.item_name as itemName,
+            oi.item_img as itemImg,
+            oi.item_spec_id as itemSpecId,
+            oi.item_spec_name as itemSpecName,
+            oi.buy_counts as buyCounts,
+            oi.price as price
+        FROM
+            orders od
+        LEFT JOIN
+            order_status os
+        ON
+            od.id = os.order_id
+        LEFT JOIN
+            order_items oi
+        ON
+            od.id = oi.order_id
+        WHERE
+            od.user_id = #{paramsMap.userId}
+        AND
+            od.is_delete = 0
+            <if test="paramsMap.orderStatus != null">
+                and os.order_status = #{paramsMap.orderStatus}
+            </if>
+        ORDER BY
+            od.updated_time ASC
+    </select>
+
+
+
+
+
+</mapper>
