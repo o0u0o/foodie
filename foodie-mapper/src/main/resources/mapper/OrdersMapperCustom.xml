@@ -9,7 +9,11 @@
     <result column="realPayAmount" jdbcType="INTEGER" property="realPayAmount" />
     <result column="postAmount" jdbcType="INTEGER" property="postAmount" />
     <result column="orderStatus" jdbcType="INTEGER" property="orderStatus" />
-    <collection property="subOrderItemVOList" ofType="com.o0u0o.pojo.vo.MySubOrderItemVO" >
+
+    <collection property="subOrderItemVOList"
+                select="getSubItems"
+                column="orderId"
+                ofType="com.o0u0o.pojo.vo.MySubOrderItemVO" >
       <result column="itemId" jdbcType="VARCHAR" property="itemId" />
       <result column="itemImg" jdbcType="VARCHAR" property="itemImg" />
       <result column="itemName" jdbcType="VARCHAR" property="itemName" />
@@ -20,8 +24,24 @@
 
     </resultMap>
 
-    <!-- 查询我的订单   -->
-    <select id="queryMyOrders" resultMap="myOrdersVO" parameterType="Map">
+    <!-- 查询子订单   -->
+    <select id="getSubItems" parameterType="String" resultType="com.o0u0o.pojo.vo.MySubOrderItemVO">
+        SELECT
+            oi.item_id as itemId,
+            oi.item_name as itemName,
+            oi.item_img as itemImg,
+            oi.item_spec_id as itemSpecId,
+            oi.item_spec_name as itemSpecName,
+            oi.buy_counts as buyCounts,
+            oi.price as price
+        FROM
+            order_items oi
+        WHERE
+            oi.order_id =  #{orderId}
+    </select>
+
+    <!-- 查询我的订单 未使用  -->
+    <select id="queryMyOrdersDoNotUse" resultMap="myOrdersVO" parameterType="Map">
         SELECT
             od.id as orderId,
             od.created_time as createdTime,
@@ -55,6 +75,32 @@
             </if>
         ORDER BY
             od.updated_time ASC
+    </select>
+
+    <!--  查询我的订单  -->
+    <select id="queryMyOrders" resultMap="myOrdersVO" parameterType="Map">
+        SELECT
+            od.id as orderId,
+            od.created_time as createdTime,
+            od.pay_method as payMethod,
+            od.real_pay_amount as realPayAmount,
+            od.post_amount as postAmount,
+            os.order_status as orderStatus
+        FROM
+            orders od
+        LEFT JOIN
+            order_status os
+        ON
+            od.id = os.order_id
+        WHERE
+            od.user_id = #{paramsMap.userId}
+        AND
+            od.is_delete = 0
+        <if test="paramsMap.orderStatus != null">
+            and os.order_status = #{paramsMap.orderStatus}
+        </if>
+        ORDER BY
+        od.updated_time ASC
     </select>
 
 
