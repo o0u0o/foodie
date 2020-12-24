@@ -1,5 +1,6 @@
 package com.o0u0o.controller.usercenter;
 
+import com.o0u0o.controller.shop.BaseController;
 import com.o0u0o.pojo.Orders;
 import com.o0u0o.pojo.Users;
 import com.o0u0o.service.usercenter.MyOrdersService;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(value = "用户中心 - 我的订单", tags = {"用户中心我的订单相关接口"})
 @RestController
 @RequestMapping("/myorders")
-public class MyOrdersController {
+public class MyOrdersController extends BaseController {
 
     @Autowired
     private MyOrdersService myOrdersService;
@@ -96,22 +97,6 @@ public class MyOrdersController {
             return IJsonResult.errorMsg("订单删除失败!");
         }
 
-        return IJsonResult.ok();
-    }
-
-
-    //========== PRIVATE METHOD ==========
-
-    /**
-     * 用于验证用户订单是否有关联关系，避免非法用户调用
-     * @param orderId
-     * @return
-     */
-    private IJsonResult checkUserOrder(String userId ,String orderId){
-        Orders order = myOrdersService.queryMyOrder(userId, orderId);
-        if (order == null){
-            return IJsonResult.errorMsg("订单不存在！");
-        }
         return IJsonResult.ok();
     }
 
