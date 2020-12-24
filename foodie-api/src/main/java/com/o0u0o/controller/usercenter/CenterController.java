@@ -1,6 +1,8 @@
 package com.o0u0o.controller.usercenter;
 
+import com.o0u0o.pojo.Orders;
 import com.o0u0o.pojo.Users;
+import com.o0u0o.service.usercenter.MyOrdersService;
 import com.o0u0o.service.usercenter.UserCenterService;
 import com.o0u0o.utils.IJsonResult;
 import io.swagger.annotations.Api;
@@ -24,6 +26,9 @@ public class CenterController {
 
     @Autowired
     private UserCenterService userCenterService;
+
+    @Autowired
+    private MyOrdersService myOrdersService;
 
     @ApiOperation(value = "获取用户信息", notes = "获取用户信息", httpMethod = "GET")
     @GetMapping("/userInfo")

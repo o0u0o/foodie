@@ -1,5 +1,6 @@
 package com.o0u0o.controller.usercenter;
 
+import com.o0u0o.pojo.Orders;
 import com.o0u0o.pojo.Users;
 import com.o0u0o.service.usercenter.MyOrdersService;
 import com.o0u0o.service.usercenter.UserCenterService;
@@ -10,6 +11,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -61,4 +63,34 @@ public class MyOrdersController {
         myOrdersService.updateDeliverOrderStatus(orderId);
         return IJsonResult.ok();
     }
+
+    @ApiOperation(value = "用户确认收货", notes = "用户确认收货", httpMethod = "POST")
+    @PostMapping("/confirmReceive")
+    public IJsonResult confirmReceive(@ApiParam(name = "orderId", value = "订单ID", required = true)
+                                          @RequestParam String orderId,
+                                     @ApiParam(name = "userId", value = "用户ID", required = true)
+                                          @RequestParam String userId) throws Exception{
+        IJsonResult checkResult = checkUserOrder(userId, orderId);
+        if (checkResult.getStatus() != HttpStatus.OK.value()){
+            return checkResult;
+        }
+        return IJsonResult.ok();
+    }
+
+
+    //========== PRIVATE METHOD ==========
+
+    /**
+     * 用于验证用户订单是否有关联关系，避免非法用户调用
+     * @param orderId
+     * @return
+     */
+    private IJsonResult checkUserOrder(String userId ,String orderId){
+        Orders order = myOrdersService.queryMyOrder(userId, orderId);
+        if (order == null){
+            return IJsonResult.errorMsg("订单不存在！");
+        }
+        return IJsonResult.ok();
+    }
+
 }

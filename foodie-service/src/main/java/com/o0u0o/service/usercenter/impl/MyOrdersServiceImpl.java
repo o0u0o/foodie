@@ -3,11 +3,15 @@ package com.o0u0o.service.usercenter.impl;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.o0u0o.enums.OrderStatusEnum;
+import com.o0u0o.enums.YesOrNo;
 import com.o0u0o.mapper.OrderStatusMapper;
+import com.o0u0o.mapper.OrdersMapper;
 import com.o0u0o.mapper.OrdersMapperCustom;
 import com.o0u0o.pojo.OrderStatus;
+import com.o0u0o.pojo.Orders;
 import com.o0u0o.pojo.vo.MyOrdersVO;
 import com.o0u0o.service.usercenter.MyOrdersService;
+import com.o0u0o.utils.IJsonResult;
 import com.o0u0o.utils.PagedGridResult;
 import com.sun.org.apache.bcel.internal.generic.NEW;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,9 @@ public class MyOrdersServiceImpl implements MyOrdersService {
 
     @Autowired
     private OrdersMapperCustom ordersMapperCustom;
+
+    @Autowired
+    private OrdersMapper ordersMapper;
 
     @Autowired
     private OrderStatusMapper orderStatusMapper;
@@ -67,6 +74,17 @@ public class MyOrdersServiceImpl implements MyOrdersService {
         orderStatusMapper.updateByExampleSelective(updateOrder, example);
     }
 
+    @Transactional(propagation = Propagation.SUPPORTS)
+    @Override
+    public Orders queryMyOrder(String userId, String orderId) {
+        Orders orders = new Orders();
+        orders.setUserId(userId);
+        orders.setId(orderId);
+        orders.setIsDelete(YesOrNo.NO.type);
+
+        return ordersMapper.selectOne(orders);
+    }
+
     //========== PRIVATE METHOD ==========
 
     private PagedGridResult setterPagedGrid(List<?> list, Integer pageNum){
@@ -78,5 +96,7 @@ public class MyOrdersServiceImpl implements MyOrdersService {
         grid.setRecords(pageInfo.getTotal());
         return grid;
     }
+
+
 
 }

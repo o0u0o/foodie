@@ -1,5 +1,6 @@
 package com.o0u0o.service.usercenter;
 
+import com.o0u0o.pojo.Orders;
 import com.o0u0o.pojo.Users;
 import com.o0u0o.pojo.bo.center.CenterUserBO;
 import com.o0u0o.utils.PagedGridResult;
@@ -13,7 +14,15 @@ public interface MyOrdersService {
 
     /**
      * 订单状态 --> 商家发货
-     * @param orderId
+     * @param orderId 订单ID
      */
     public void updateDeliverOrderStatus(String orderId);
+
+    /**
+     * 查询我的订单
+     * @param userId 用户ID
+     * @param orderId 订单ID
+     * @return
+     */
+    public Orders queryMyOrder(String userId, String orderId);
 }
