@@ -25,4 +25,19 @@ public interface MyOrdersService {
      * @return
      */
     public Orders queryMyOrder(String userId, String orderId);
+
+    /**
+     * 确认收货
+     * @param orderId 订单ID
+     * @return
+     */
+    public boolean updateReceiveOrderStatus(String orderId);
+
+    /**
+     * 删除订单 - 逻辑删除(更新状态)
+     * @param userId 用户ID
+     * @param orderId 订单ID
+     * @return
+     */
+    public boolean deleteOrder(String userId, String orderId);
 }

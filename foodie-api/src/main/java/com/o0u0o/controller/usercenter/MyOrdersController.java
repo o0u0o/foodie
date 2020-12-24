@@ -74,6 +74,28 @@ public class MyOrdersController {
         if (checkResult.getStatus() != HttpStatus.OK.value()){
             return checkResult;
         }
+        boolean res = myOrdersService.updateReceiveOrderStatus(orderId);
+        if (!res){
+            return IJsonResult.errorMsg("订单确认收货失败!");
+        }
+        return IJsonResult.ok();
+    }
+
+    @ApiOperation(value = "用户删除订单", notes = "用户删除订单", httpMethod = "POST")
+    @PostMapping("/delete")
+    public IJsonResult delete(@ApiParam(name = "orderId", value = "订单ID", required = true)
+                                      @RequestParam String orderId,
+                                      @ApiParam(name = "userId", value = "用户ID", required = true)
+                                      @RequestParam String userId) throws Exception{
+        IJsonResult checkResult = checkUserOrder(userId, orderId);
+        if (checkResult.getStatus() != HttpStatus.OK.value()){
+            return checkResult;
+        }
+        boolean res = myOrdersService.deleteOrder(userId, orderId);
+        if (!res){
+            return IJsonResult.errorMsg("订单删除失败!");
+        }
+
         return IJsonResult.ok();
     }
 
