@@ -7,6 +7,7 @@ import com.o0u0o.pojo.OrderItems;
 import com.o0u0o.pojo.OrderStatus;
 import com.o0u0o.pojo.Orders;
 import com.o0u0o.pojo.bo.center.OrderItemsCommentBO;
+import com.o0u0o.pojo.vo.MyCommentVO;
 import com.o0u0o.service.usercenter.MyCommentsService;
 import com.o0u0o.utils.PagedGridResult;
 import org.n3r.idworker.Sid;
@@ -27,7 +28,7 @@ import java.util.Map;
  * @date 2020/12/24 4:59 下午
  */
 @Service
-public class MyCommentsServiceImpl implements MyCommentsService {
+public class MyCommentsServiceImpl extends BaseService implements MyCommentsService {
 
     @Autowired
     private OrderItemsMapper orderItemsMapper;
@@ -93,6 +94,8 @@ public class MyCommentsServiceImpl implements MyCommentsService {
 
         PageHelper.startPage(pageNum, pageSize);
 
-        return null;
+        List<MyCommentVO> list = itemsCommentsMapperCustom.queryMyComments(map);
+
+        return setterPagedGrid(list, pageNum);
     }
 }

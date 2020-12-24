@@ -26,9 +26,9 @@ public interface MyCommentsService {
     /**
      * 我的评论查询 分页
      * @param userId    用户ID
-     * @param page
+     * @param pageNum
      * @param pageSize
      * @return
      */
-    public PagedGridResult queryMyComments(String userId, Integer page, Integer pageSize);
+    public PagedGridResult queryMyComments(String userId, Integer pageNum, Integer pageSize);
 }

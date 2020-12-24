@@ -79,4 +79,22 @@ public class MyCommentController extends BaseController {
         return IJsonResult.ok();
     }
 
+    @ApiOperation(value = "查询我的评价", notes = "查询我的评价", httpMethod = "POST")
+    @PostMapping("/query")
+    public IJsonResult query(
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam String userId,
+            @ApiParam(name = "page", value = "查询下一页的第几页", required = false)
+            @RequestParam(name = "page", defaultValue = "1") Integer page,
+            @ApiParam(name = "pageSize", value = "分页的每一页显示的条数", required = false)
+            @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize){
+
+        if (StringUtils.isBlank(userId)){
+            return IJsonResult.errorMsg(null);
+        }
+
+        PagedGridResult gridResult = myCommentsService.queryMyComments(userId, page, pageSize);
+        return IJsonResult.ok(gridResult);
+    }
+
 }

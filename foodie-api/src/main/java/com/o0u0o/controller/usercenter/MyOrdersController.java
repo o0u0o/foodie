@@ -30,7 +30,7 @@ public class MyOrdersController extends BaseController {
 
     @ApiOperation(value = "查询订单列表", notes = "查询订单列表", httpMethod = "POST")
     @PostMapping("/query")
-    public IJsonResult comments(
+    public IJsonResult query(
             @ApiParam(name = "userId", value = "用户ID", required = true)
             @RequestParam String userId,
             @ApiParam(name = "orderStatus", value = "订单状态", required = false)

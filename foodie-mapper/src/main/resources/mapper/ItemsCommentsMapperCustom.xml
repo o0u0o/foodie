@@ -2,6 +2,16 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.o0u0o.mapper.ItemsCommentsMapperCustom">
   
+  <resultMap id="myComments" type="com.o0u0o.pojo.vo.MyCommentVO">
+    <id column="commentId" property="commentId"/>
+    <id column="content" property="content"/>
+    <id column="createdTime" property="createdTime"/>
+    <id column="itemId" property="itemId"/>
+    <id column="itemName" property="itemName"/>
+    <id column="specName" property="specName"/>
+    <id column="itemImg" property="itemImg"/>
+  </resultMap>
+  
   <select id="saveComments" parameterType="Map">
     insert into
         items_comments
@@ -11,7 +21,7 @@
               item_id,
               item_name,
               item_spec_id,
-              sepc_name,
+              spec_name,
               comment_level,
               content,
               created_time,
@@ -32,6 +42,29 @@
             now()
           )
         </foreach>
+  </select>
+  
+  <select id="queryMyComments" parameterType="Map" resultMap="myComments">
+    SELECT
+        ic.id as commentId,
+        ic.content as content,
+        ic.created_time as createdTime,
+        ic.item_id as itemId,
+        ic.item_name as itemName,
+        ic.spec_name as specName,
+        ii.url as itemImg
+    FROM
+        items_comments ic
+    LEFT JOIN
+        items_img ii
+    ON
+        ic.item_id = ii.item_id
+    WHERE
+        ic.user_id = #{paramsMap.userId}
+    AND
+        ii.is_main = 1
+    ORDER BY
+        ic.created_time
   </select>
 
 </mapper>
