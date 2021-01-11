@@ -115,4 +115,22 @@ public class MyOrdersController extends BaseController {
         return IJsonResult.ok();
     }
 
+    @ApiOperation(value = "查询订单动向", notes = "查询订单动向", httpMethod = "POST")
+    @PostMapping("/trend")
+    public IJsonResult trend(
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam String userId,
+            @ApiParam(name = "page", value = "查询下一页的第几页", required = false)
+            @RequestParam(name = "page", defaultValue = "1") Integer page,
+            @ApiParam(name = "pageSize", value = "分页的每一页显示的条数", required = false)
+            @RequestParam(name = "pageSize", defaultValue = "20") Integer pageSize){
+
+        if (StringUtils.isBlank(userId)){
+            return IJsonResult.errorMsg(null);
+        }
+
+        PagedGridResult gridResult = myOrdersService.getOrdersTrend(userId, page, pageSize);
+        return IJsonResult.ok(gridResult);
+    }
+
 }

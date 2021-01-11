@@ -47,4 +47,15 @@ public interface MyOrdersService {
      * @param userId 用户ID
      */
     public OrderStatusCountsVO getOrderStatusCounts(String userId);
+
+    /**
+     * 获得分页的订单动向
+     * @param userId
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    public PagedGridResult getOrdersTrend(String userId,
+                                         Integer pageNum,
+                                         Integer pageSize);
 }
