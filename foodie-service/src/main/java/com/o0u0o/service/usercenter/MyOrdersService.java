@@ -3,6 +3,7 @@ package com.o0u0o.service.usercenter;
 import com.o0u0o.pojo.Orders;
 import com.o0u0o.pojo.Users;
 import com.o0u0o.pojo.bo.center.CenterUserBO;
+import com.o0u0o.pojo.vo.OrderStatusCountsVO;
 import com.o0u0o.utils.PagedGridResult;
 
 public interface MyOrdersService {
@@ -40,4 +41,10 @@ public interface MyOrdersService {
      * @return
      */
     public boolean deleteOrder(String userId, String orderId);
+
+    /**
+     * 查询用户订单数
+     * @param userId 用户ID
+     */
+    public OrderStatusCountsVO getOrderStatusCounts(String userId);
 }

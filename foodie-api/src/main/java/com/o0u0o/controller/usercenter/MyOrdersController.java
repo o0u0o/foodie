@@ -3,6 +3,7 @@ package com.o0u0o.controller.usercenter;
 import com.o0u0o.controller.shop.BaseController;
 import com.o0u0o.pojo.Orders;
 import com.o0u0o.pojo.Users;
+import com.o0u0o.pojo.vo.OrderStatusCountsVO;
 import com.o0u0o.service.usercenter.MyOrdersService;
 import com.o0u0o.service.usercenter.UserCenterService;
 import com.o0u0o.utils.IJsonResult;
@@ -27,6 +28,20 @@ public class MyOrdersController extends BaseController {
 
     @Autowired
     private MyOrdersService myOrdersService;
+
+    @ApiOperation(value = "获得订单状态数概况", notes = "获得订单状态数概况", httpMethod = "POST")
+    @PostMapping("/statusCounts")
+    public IJsonResult statusCounts(
+            @ApiParam(name = "userId", value = "用户ID", required = true)
+            @RequestParam String userId){
+
+        if (StringUtils.isBlank(userId)){
+            return IJsonResult.errorMsg(null);
+        }
+
+        OrderStatusCountsVO result = myOrdersService.getOrderStatusCounts(userId);
+        return IJsonResult.ok(result);
+    }
 
     @ApiOperation(value = "查询订单列表", notes = "查询订单列表", httpMethod = "POST")
     @PostMapping("/query")
