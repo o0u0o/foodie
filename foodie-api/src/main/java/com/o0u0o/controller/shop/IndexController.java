@@ -8,15 +8,20 @@ import com.o0u0o.pojo.vo.NewItemsVO;
 import com.o0u0o.service.shop.CarouselService;
 import com.o0u0o.service.shop.CategoryService;
 import com.o0u0o.utils.IJsonResult;
+import com.o0u0o.utils.JsonUtils;
+import com.o0u0o.utils.RedisOperator;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -27,6 +32,12 @@ import java.util.List;
 @RestController
 @RequestMapping("index")
 public class IndexController {
+
+    @Autowired
+    private RedisTemplate redisTemplate;
+
+    @Autowired
+    private RedisOperator redisOperator;
 
     @Autowired
     private CarouselService carouselService;
@@ -61,7 +72,22 @@ public class IndexController {
         if (rootCatId == null){
             return IJsonResult.errorMsg("分类不存在");
         }
-        List<CategoryVO> list = categoryService.getSubCatList(rootCatId);
+        List<CategoryVO> list = new ArrayList<>();
+        String catsStr = redisOperator.get("subCat:" + rootCatId);
+        if (StringUtils.isBlank(catsStr)){
+            list = categoryService.getSubCatList(rootCatId);
+            //避免缓存穿透：如果有缓存读取缓存 如果没有缓存 设置空缓存以避免缓存穿透
+            if (list != null && list.size() > 0){
+                redisOperator.set("subCat:" + rootCatId, JsonUtils.objectToJson(list));
+            }else {
+                //5分钟的空缓存
+                redisOperator.set("subCat:" + rootCatId, JsonUtils.objectToJson(list), 5*60);
+            }
+
+        }else {
+           list = JsonUtils.jsonToList(catsStr, CategoryVO.class);
+        }
+
         return IJsonResult.ok(list);
     }
 
