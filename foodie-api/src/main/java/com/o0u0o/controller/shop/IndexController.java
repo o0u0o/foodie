@@ -76,7 +76,18 @@ public class IndexController {
         String catsStr = redisOperator.get("subCat:" + rootCatId);
         if (StringUtils.isBlank(catsStr)){
             list = categoryService.getSubCatList(rootCatId);
-            //避免缓存穿透：如果有缓存读取缓存 如果没有缓存 设置空缓存以避免缓存穿透
+            /**
+             * 缓存穿透：
+             * 查询的key 在redis中不存在，对应的id在数据库也不存在，
+             * 此时被非法用户进行攻击，大量的请求会直接打在数据库上，
+             * 造成宕机，从而影响整个系统，这种现象被称为缓存穿透，
+             *
+             * 解决方法1：
+             * 把空的数据也缓存起来，比如空字符串、空对象、空数组或者list
+             *
+             * 解决方案2：
+             * 布隆过滤器：代码复杂度会更大，不建议使用
+             */
             if (list != null && list.size() > 0){
                 redisOperator.set("subCat:" + rootCatId, JsonUtils.objectToJson(list));
             }else {
