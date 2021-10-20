@@ -7,9 +7,9 @@ spring:
     password: Mysql8.0
   redis:
     database: 3
-    host: 118.24.74.61
+    host: 127.0.0.1
     port: 6379
-    password: puEYGSomuUP65KU6
+#    password: puEYGSomuUP65KU6
 
 mybatis:
   configuration:

@@ -1,9 +1,14 @@
 package com.o0u0o.utils;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.StringRedisConnection;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.stereotype.Component;
 import org.springframework.data.redis.core.StringRedisTemplate;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -101,6 +106,35 @@ public class RedisOperator {
      */
     public String get(String key) {
         return (String)redisTemplate.opsForValue().get(key);
+    }
+
+    /**
+     * 批量查询key 对应命名mget
+     * 通过multiGet进行批量查询
+     * @param keys
+     * @return
+     */
+    public List<String> get(List<String> keys) {
+        return redisTemplate.opsForValue().multiGet(keys);
+    }
+
+    /**
+     * 批量查询key 使用管道pipeline
+     * @param keys
+     * @return
+     */
+    public List<Object> batchGet(List<String> keys) {
+        return redisTemplate.executePipelined(new RedisCallback<String>() {
+            @Override
+            public String doInRedis(RedisConnection redisConnection) throws DataAccessException {
+                StringRedisConnection src = (StringRedisConnection)redisConnection;
+                for (String k : keys){
+                    src.get(k);
+                }
+                return null;
+            }
+        });
+
     }
 
     // Hash（哈希表）
