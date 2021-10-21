@@ -1,6 +1,5 @@
 package com.o0u0o.controller.usercenter;
 
-import com.o0u0o.pojo.Orders;
 import com.o0u0o.pojo.Users;
 import com.o0u0o.service.usercenter.MyOrdersService;
 import com.o0u0o.service.usercenter.UserCenterService;

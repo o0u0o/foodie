@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author mac
+ * @author o0u0o
  * @date 2020/12/3 3:25 下午
  */
 @Api(value = "用户信息接口", tags = {"用户信息相关接口"})
