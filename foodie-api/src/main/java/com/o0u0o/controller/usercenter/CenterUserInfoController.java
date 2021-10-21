@@ -3,6 +3,7 @@ package com.o0u0o.controller.usercenter;
 import com.o0u0o.controller.shop.BaseController;
 import com.o0u0o.pojo.Users;
 import com.o0u0o.pojo.bo.center.CenterUserBO;
+import com.o0u0o.pojo.vo.UsersVO;
 import com.o0u0o.resource.FileUpload;
 import com.o0u0o.service.usercenter.UserCenterService;
 import com.o0u0o.utils.CookieUtils;
@@ -129,8 +130,10 @@ public class CenterUserInfoController extends BaseController {
         //更新用户头像到数据库
         Users userResult = userCenterService.updateUserFace(userId, finalUserFaceUrl);
 
-//        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO), true);
-        // TODO 后续要改，增加令牌Token, 会整合进redis 实现分布式会话管理
+        // 增加令牌Token, 会整合进redis 实现分布式会话管理
+        UsersVO usersVO = conventUsersVO(userResult);
+
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO), true);
 
         return IJsonResult.ok();
 
@@ -150,10 +153,12 @@ public class CenterUserInfoController extends BaseController {
             return IJsonResult.errorMap(errors);
         }
         Users userResult = userCenterService.updateUserInfo(userId, centerUserBO);
-        userResult = setNullProperty(userResult);
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(userResult), true);
 
-        // TODO 后续要改，增加令牌Token, 会整合进redis 实现分布式会话管理
+        //增加令牌Token, 会整合进redis 实现分布式会话管理
+        UsersVO usersVO = conventUsersVO(userResult);
+
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO), true);
+
         return IJsonResult.ok();
 
     }

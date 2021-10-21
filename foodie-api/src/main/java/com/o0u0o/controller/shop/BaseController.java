@@ -1,11 +1,16 @@
 package com.o0u0o.controller.shop;
 
 import com.o0u0o.pojo.Orders;
+import com.o0u0o.pojo.Users;
+import com.o0u0o.pojo.vo.UsersVO;
 import com.o0u0o.service.usercenter.MyOrdersService;
 import com.o0u0o.utils.IJsonResult;
+import com.o0u0o.utils.RedisOperator;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
+import java.util.UUID;
 
 /**
  * 通用Controller
@@ -16,6 +21,9 @@ public class BaseController {
 
     @Autowired
     private MyOrdersService myOrdersService;
+
+    @Autowired
+    private RedisOperator redisOperator;
 
     public static final String FOODIE_SHOPCART = "shopcart";
 
@@ -51,6 +59,22 @@ public class BaseController {
             return IJsonResult.errorMsg("订单不存在！");
         }
         return IJsonResult.ok(order);
+    }
+
+    /**
+     * 实现用户的redis会话 生成用户token 存入redis会话
+     * @param userResult
+     * @return
+     */
+    public UsersVO conventUsersVO(Users userResult){
+        //实现用户的redis会话 生成用户token 存入redis会话
+        String uniqueToken = UUID.randomUUID().toString().trim();
+        redisOperator.set(REDIS_USER_TOKEN + ":" + userResult.getId(), uniqueToken);
+
+        UsersVO usersVO = new UsersVO();
+        BeanUtils.copyProperties(userResult, usersVO);
+        usersVO.setUserUniqueToken(uniqueToken);
+        return usersVO;
     }
 
 }

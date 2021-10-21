@@ -141,7 +141,6 @@ public class PassportController extends BaseController {
 
         //TODO 用户退出登录，需要清空购物车
 
-
         return IJsonResult.ok();
     }
 
@@ -150,21 +149,7 @@ public class PassportController extends BaseController {
 
     //=========== PRIVATE ===========
 
-    /**
-     * 实现用户的redis会话 生成用户token 存入redis会话
-     * @param userResult
-     * @return
-     */
-    private UsersVO conventUsersVO(Users userResult){
-        //实现用户的redis会话 生成用户token 存入redis会话
-        String uniqueToken = UUID.randomUUID().toString().trim();
-        redisOperator.set(REDIS_USER_TOKEN + ":" + userResult.getId(), uniqueToken);
 
-        UsersVO usersVO = new UsersVO();
-        BeanUtils.copyProperties(userResult, usersVO);
-        usersVO.setUserUniqueToken(uniqueToken);
-        return usersVO;
-    }
 
     /**
      * 敏感信息置空
