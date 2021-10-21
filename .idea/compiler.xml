@@ -7,16 +7,18 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="foodie-service" />
+        <module name="foodie-cas" />
+        <module name="foodie-api" />
+        <module name="foodie-mapper" />
         <module name="foodie-pojo" />
         <module name="foodie-payment" />
         <module name="foodie-common" />
-        <module name="foodie-api" />
-        <module name="foodie-mapper" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="foodie" target="1.8" />
       <module name="foodie-api" target="1.8" />
+      <module name="foodie-cas" target="1.8" />
       <module name="foodie-common" target="1.8" />
       <module name="foodie-mapper" target="1.8" />
       <module name="foodie-payment" target="1.8" />
@@ -27,6 +29,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="foodie-api" options="-parameters" />
+      <module name="foodie-cas" options="-parameters" />
       <module name="foodie-common" options="-parameters" />
       <module name="foodie-mapper" options="-parameters" />
       <module name="foodie-payment" options="-parameters" />
