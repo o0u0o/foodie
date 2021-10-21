@@ -2,19 +2,19 @@ package com.o0u0o.controller.shop;
 
 import com.o0u0o.pojo.Users;
 import com.o0u0o.pojo.bo.UserBO;
+import com.o0u0o.pojo.vo.UsersVO;
 import com.o0u0o.service.shop.UserService;
-import com.o0u0o.utils.CookieUtils;
-import com.o0u0o.utils.IJsonResult;
-import com.o0u0o.utils.JsonUtils;
-import com.o0u0o.utils.MD5Utils;
+import com.o0u0o.utils.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.UUID;
 
 /**
  * 通行证接口
@@ -24,10 +24,13 @@ import javax.servlet.http.HttpServletResponse;
 @Api(value = "注册登录", tags = {"用于注册登录的相关接口"})
 @RestController
 @RequestMapping("passport")
-public class PassportController {
+public class PassportController extends BaseController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RedisOperator redisOperator;
 
     @ApiOperation(value = "用户是否存在", notes = "用户是否存在", httpMethod = "GET")
     @GetMapping("/usernameIsExist")
@@ -81,12 +84,16 @@ public class PassportController {
         //4.实现注册
         Users userResult = userService.createUser(userBO);
 
-        userResult = setNullProperty(userResult);
+        //userResult = setNullProperty(userResult);
 
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(userResult), true);
-        //TODO 生成用户token 存入redis会话
+        //实现用户的redis会话 生成用户token 存入redis会话
+        UsersVO usersVO = conventUsersVO(userResult);
+
+
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO), true);
 
         //TODO 同步购物车数据
+
         return IJsonResult.ok(userResult);
     }
 
@@ -110,13 +117,15 @@ public class PassportController {
             return IJsonResult.errorMsg("用户名或密码不正确");
         }
 
-        userResult = setNullProperty(userResult);
+        // 生成用户token，存入redis会话
+        UsersVO usersVO = conventUsersVO(userResult);
+        //userResult = setNullProperty(userResult);
 
         //isEncode 是否设置cookie加密
-        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(userResult), true);
-        // TODO 生成用户token，存入redis会话
+        CookieUtils.setCookie(request, response, "user", JsonUtils.objectToJson(usersVO), true);
+
         // TODO 同步购物车数据
-        return IJsonResult.ok(userResult);
+        return IJsonResult.ok(usersVO);
     }
 
     @ApiOperation(value = "用户退出登录", notes = "用户退出登录", httpMethod = "POST")
@@ -127,8 +136,12 @@ public class PassportController {
         //清除用户相关信息的cookie
         CookieUtils.deleteCookie(request, response, "user");
 
+        //分布式会话中需要清除用户数据
+        redisOperator.del(REDIS_USER_TOKEN + ":" + userId);
+
         //TODO 用户退出登录，需要清空购物车
-        //TODO 分布式会话中需要清除用户数据
+
+
         return IJsonResult.ok();
     }
 
@@ -136,6 +149,23 @@ public class PassportController {
 
 
     //=========== PRIVATE ===========
+
+    /**
+     * 实现用户的redis会话 生成用户token 存入redis会话
+     * @param userResult
+     * @return
+     */
+    private UsersVO conventUsersVO(Users userResult){
+        //实现用户的redis会话 生成用户token 存入redis会话
+        String uniqueToken = UUID.randomUUID().toString().trim();
+        redisOperator.set(REDIS_USER_TOKEN + ":" + userResult.getId(), uniqueToken);
+
+        UsersVO usersVO = new UsersVO();
+        BeanUtils.copyProperties(userResult, usersVO);
+        usersVO.setUserUniqueToken(uniqueToken);
+        return usersVO;
+    }
+
     /**
      * 敏感信息置空
      * @param userResult

@@ -70,6 +70,7 @@ public class RedisController {
     /**
      * 批量查询mget（提高吞吐量）
      * 对redis的key进行大量查询 优化工作
+     * 1、mget只能获取字符串类型
      * 2、也可通过管道的功能来查询 如下
      * @param keys
      * @return
@@ -81,7 +82,8 @@ public class RedisController {
     }
 
     /**
-     * 管道方式批量获取
+     * 批量获取key 管道方式批量获取
+     * 管道支付的类型比较丰富
      * @param keys
      * @return
      */
