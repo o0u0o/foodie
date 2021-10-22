@@ -16,7 +16,8 @@ import io.swagger.annotations.ApiModelProperty;
  * 				502：拦截器拦截到用户token出错
  * 				555：异常抛出信息
  * 				556: 用户qq校验异常
- * @author mac
+ * 			    557: 校验用户是否在cas登录（用户门票的校验）
+ * @author o0u0o
  * @date 2020/10/26 2:39 下午
  */
 @ApiModel(value = "响应结果")
@@ -72,6 +73,11 @@ public class IJsonResult {
 
     public static IJsonResult errorUserQQ(String msg) {
         return new IJsonResult(556, msg, null);
+    }
+
+    /** 错误的用户门票 */
+    public static IJsonResult errorUserTicket(String msg) {
+        return new IJsonResult(557, msg, null);
     }
 
     public IJsonResult() {

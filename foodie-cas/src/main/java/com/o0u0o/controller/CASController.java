@@ -1,12 +1,26 @@
 package com.o0u0o.controller;
 
-import com.sun.deploy.net.HttpResponse;
+import com.o0u0o.consts.RedisConst;
+import com.o0u0o.pojo.Users;
+import com.o0u0o.pojo.vo.UsersVO;
+import com.o0u0o.service.shop.UserService;
+import com.o0u0o.utils.IJsonResult;
+import com.o0u0o.utils.JsonUtils;
+import com.o0u0o.utils.MD5Utils;
+import com.o0u0o.utils.RedisOperator;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.UUID;
 
 /**
  * 统一认证管理系统Controller
@@ -17,12 +31,18 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class CASController {
 
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private RedisOperator redisOperator;
+
 
     @GetMapping("/login")
     public String login(HttpServletRequest request,
-                        HttpResponse response,
-                        String returnUrl,
-                        Model model){
+                        HttpServletResponse response,
+                        Model model,
+                        String returnUrl){
         model.addAttribute("returnUrl", returnUrl);
 
         //todo 后续完善校验是否登录
@@ -30,4 +50,138 @@ public class CASController {
         // 用户从未登录过，第一次进入则跳转到cas的统一登录页面
         return "login";
     }
+
+    /**
+     * CAS的统一登录接口
+     * 目的：
+     *  1、登录后创建用户会话 -> uniqueToken
+     *  2、创建用户全局门票,用于表示在cas端是否登录 -> userTicket
+     *  3、创建用户的临时票据，用于回跳，回传 -> tmpTicket
+     * @param request
+     * @param response
+     * @param model
+     * @param username
+     * @param password
+     * @param returnUrl
+     * @return
+     * @throws Exception
+     */
+    @PostMapping("/doLogin")
+    public String doLogin(HttpServletRequest request,
+                          HttpServletResponse response,
+                          Model model,
+                          String username,
+                          String password,
+                          String returnUrl) throws Exception {
+        model.addAttribute("returnUrl", returnUrl);
+
+        // 0、校验用户名和密码必须不能为空
+        if (StringUtils.isBlank(username) || StringUtils.isBlank(password)){
+            model.addAttribute("errorMsg", "用户名或密码不能为空");
+            return "login";
+        }
+
+        // 1、实现登录业务
+        Users userResult = userService.queryUserForLogin(username, MD5Utils.getMD5Str(password));
+        if (userResult ==  null){
+            model.addAttribute("errorMsg", "用户名和密码不正确");
+            return "login";
+        }
+
+        // 2、实现用户的redis会话 生成用户token 存入redis会话
+        conventUsersVO(userResult);
+
+        // 3、生成ticket门票，全局门票，代表用户在CAS端登录过
+        String userTicket = UUID.randomUUID().toString().trim();
+        // 3.1 用户全局门票需要放入cas端的cookie中
+        setCookie(RedisConst.COOKIE_USER_TICKET, userTicket, response);
+
+        // 4、userTicket需要关联用户id，并且放入到redis中，代表用户有了门票，可以在各个系统进行访问
+        redisOperator.set(RedisConst.REDIS_USER_TICKET + ":" + userTicket, userResult.getId());
+
+        // 5、生成临时票据，回跳到调用端网站（是由CAS端所签发的一个一次性的临时ticket，类型于微信的code码）
+        String tmpTicket = createTmpTicket();
+
+        //6、回跳
+        /**
+         * userTicket：用于表示用户在CAS端登录状态：已经登录
+         * tmpTicket：用于颁发给用户进行一次性的验证的票据，有时效性
+         */
+
+        /**
+         * 举例：
+         * 我们去动物园玩耍，大门口买了一张通票，这个就cas系统的全局门票和用户全局会话
+         * 动物园里有一些小的景点，需要凭你的门票去领取一次性的票据，有了这些票据以后，就可以去这些小的景点
+         * 这样一个小的景点就是我们这里对应一个个的站点，
+         * 当我们使用完毕这个票据后，就需要销毁。
+         */
+//        return  "login";
+        return "redirect:" + returnUrl + "?tmpTicket=" + tmpTicket;
+    }
+
+    @PostMapping("/verifyTmpTicket")
+    @ResponseBody
+    public IJsonResult verifyTmpTicket(HttpServletRequest request,
+                                       HttpServletResponse response,
+                                       String tmpTicket) throws Exception {
+        // 使用一次性临时票据来验证用户是否登录，如果登录过，把用户会话信息返回给站点
+        // 使用完毕后，需要销毁临时票据
+        String tmpTicketValue = redisOperator.get(RedisConst.REDIS_TMP_TICKET + tmpTicket);
+        if (StringUtils.isBlank(tmpTicketValue)){
+            return IJsonResult.errorUserTicket("用户票据异常");
+        }
+
+        // 0、如果这个临时票据OK，则需要销毁，并且拿到cas端cookie的全局userTicket，以此再获取用户会话
+        if (!tmpTicketValue.equals(MD5Utils.getMD5Str(tmpTicket))) {
+            return IJsonResult.errorUserTicket("用户票据异常");
+        }
+
+        // 1、销毁临时票据
+        redisOperator.del(RedisConst.REDIS_TMP_TICKET + tmpTicket);
+
+        return IJsonResult.ok();
+    }
+
+    /**
+     * 设置cookie
+     */
+    private void setCookie(String key,
+                           String val,
+                           HttpServletResponse response){
+        Cookie cookie = new Cookie(key, val);
+        cookie.setDomain("sso.com");
+        cookie.setPath("/");
+        response.addCookie(cookie);
+    }
+
+    /**
+     * 创建临时票据，并保存到redis中
+     * @return
+     */
+    private String createTmpTicket() {
+        String tmpTicket = UUID.randomUUID().toString().trim();
+        //存储到临时票据到redis 过期时间600秒
+        try {
+            redisOperator.set(RedisConst.REDIS_TMP_TICKET + ":" + tmpTicket, MD5Utils.getMD5Str(tmpTicket), 600);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return tmpTicket;
+    }
+
+    /**
+     * 实现用户的redis会话 生成用户token 存入redis会话
+     * @param userResult
+     * @return
+     */
+    private void conventUsersVO(Users userResult){
+        //实现用户的redis会话 生成用户token 存入redis会话
+        String uniqueToken = UUID.randomUUID().toString().trim();
+        UsersVO usersVO = new UsersVO();
+        BeanUtils.copyProperties(userResult, usersVO);
+        usersVO.setUserUniqueToken(uniqueToken);
+        redisOperator.set(RedisConst.REDIS_USER_TOKEN + ":" + userResult.getId(), JsonUtils.objectToJson(usersVO));
+    }
+
 }
