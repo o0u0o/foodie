@@ -24,6 +24,7 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.addAllowedOrigin("http://foodie.laitou.info");
         config.addAllowedOrigin("http://localhost:8080");
+        config.addAllowedOrigin("http://api.z.mukewang.com:8080");
         config.addAllowedOrigin("http://localhost:8080/foodie-shop/");
 
         //1.2. 设置是否发送cookie信息

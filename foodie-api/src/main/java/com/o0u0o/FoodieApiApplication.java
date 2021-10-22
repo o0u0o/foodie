@@ -26,9 +26,9 @@ import tk.mybatis.spring.annotation.MapperScan;
 @EnableRedisHttpSession
 // 开启定时任务
 @EnableScheduling
-public class Application {
+public class FoodieApiApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        SpringApplication.run(FoodieApiApplication.class, args);
     }
 }

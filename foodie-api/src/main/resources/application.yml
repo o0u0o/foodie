@@ -37,9 +37,9 @@ spring:
       max-file-size: 2MB    #文件上传大小限制2m
       max-request-size: 10MB  #请求大小限制为10mb
 
-  #spring session的类型
-  session:
-    store-type: redis
+  #spring session的类型 （目前不使用spring session因为耦合性较高，其他非java项目使用redis分布式会话不方便）
+#  session:
+#    store-type: redis
 
 ##################################################################################
 #

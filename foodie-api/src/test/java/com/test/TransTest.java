@@ -1,6 +1,6 @@
 package com.test;
 
-import com.o0u0o.Application;
+import com.o0u0o.FoodieApiApplication;
 import com.o0u0o.service.shop.StuService;
 import com.o0u0o.service.shop.TestTransService;
 import org.junit.Ignore;
@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * @Descripton: 事务演示测试
  **/
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = Application.class)
+@SpringBootTest(classes = FoodieApiApplication.class)
 public class TransTest {
 
     @Autowired

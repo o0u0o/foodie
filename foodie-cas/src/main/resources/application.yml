@@ -36,10 +36,13 @@ spring:
     multipart:
       max-file-size: 2MB    #文件上传大小限制2m
       max-request-size: 10MB  #请求大小限制为10mb
-
-  #spring session的类型
-  session:
-    store-type: redis
+  thymeleaf:
+    mode: HTML
+    encoding: UTF-8
+    # 前缀
+    prefix: classpath:/templates/
+    # 后缀
+    suffix: .html
 
 ##################################################################################
 #
