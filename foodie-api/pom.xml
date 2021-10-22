@@ -10,6 +10,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>foodie-api</artifactId>
+    <description>foodie-cas 统一认证管理系统</description>
 
     <dependencies>
 

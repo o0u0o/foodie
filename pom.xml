@@ -14,6 +14,7 @@
         <module>foodie-mapper</module>
         <module>foodie-service</module>
         <module>foodie-api</module>
+        <module>foodie-cas</module>
         <module>foodie-payment</module>
     </modules>
 
