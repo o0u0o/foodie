@@ -115,7 +115,7 @@ public class CASController {
          * 这样一个小的景点就是我们这里对应一个个的站点，
          * 当我们使用完毕这个票据后，就需要销毁。
          */
-//        return  "login";
+        System.out.println("returnUrl:" + returnUrl);
         return "redirect:" + returnUrl + "?tmpTicket=" + tmpTicket;
     }
 
