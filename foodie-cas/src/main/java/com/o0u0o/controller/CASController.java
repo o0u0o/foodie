@@ -138,8 +138,45 @@ public class CASController {
 
         // 1、销毁临时票据
         redisOperator.del(RedisConst.REDIS_TMP_TICKET + tmpTicket);
+        
+        //1.验证并且换取用户userTicket
+        String userTicket = getCookie(request, RedisConst.COOKIE_USER_TICKET);
+        String userId = redisOperator.get(RedisConst.REDIS_USER_TICKET + ":" + userTicket);
+        if (StringUtils.isBlank(userId)){
+            return IJsonResult.errorUserTicket("用户票据异常");
+        }
 
-        return IJsonResult.ok();
+        //2.验证门票对应的user会话是否存在
+        String userRedis = redisOperator.get(RedisConst.REDIS_USER_TOKEN + ":" + userId);
+        if (StringUtils.isBlank(userRedis)){
+            return IJsonResult.errorUserTicket("用户票据异常");
+        }
+
+        // 3.验证成功，返回ok 携带redis查询出的用户会话
+        return IJsonResult.ok(JsonUtils.jsonToPojo(userRedis, UsersVO.class));
+    }
+
+
+    /**
+     * 获取cookie
+     * @param request
+     * @param key
+     * @return
+     */
+    private String getCookie(HttpServletRequest request, String key){
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null || StringUtils.isBlank(key)){
+            return null;
+        }
+
+        String cookieValue = null;
+        for (int i = 0; i < cookies.length; i++){
+            if (cookies[i].getName().equals(key)){
+                cookieValue = cookies[i].getValue();
+                break;
+            }
+        }
+        return cookieValue;
     }
 
     /**
