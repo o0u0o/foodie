@@ -45,9 +45,16 @@ public class CASController {
                         String returnUrl){
         model.addAttribute("returnUrl", returnUrl);
 
-        //todo 后续完善校验是否登录
+        //1、获取userTicket门票，如果cookie中能够获取到，证明用户登录过，此时签发一个一次性的临时票据，并且回跳
+        String userTicket = getCookie(request, RedisConst.COOKIE_USER_TICKET);
 
-        // 用户从未登录过，第一次进入则跳转到cas的统一登录页面
+        boolean isVerified = verifyUserTicket(userTicket);
+        if (isVerified){
+            String tmpTicket = createTmpTicket();
+            return "redirect:" + returnUrl + "?tmpTicket=" + tmpTicket;
+        }
+
+        // 2、用户从未登录过，第一次进入则跳转到cas的统一登录页面
         return "login";
     }
 
@@ -115,10 +122,17 @@ public class CASController {
          * 这样一个小的景点就是我们这里对应一个个的站点，
          * 当我们使用完毕这个票据后，就需要销毁。
          */
-        System.out.println("returnUrl:" + returnUrl);
         return "redirect:" + returnUrl + "?tmpTicket=" + tmpTicket;
     }
 
+    /**
+     * 验证零售票据
+     * @param request
+     * @param response
+     * @param tmpTicket
+     * @return
+     * @throws Exception
+     */
     @PostMapping("/verifyTmpTicket")
     @ResponseBody
     public IJsonResult verifyTmpTicket(HttpServletRequest request,
@@ -126,29 +140,34 @@ public class CASController {
                                        String tmpTicket) throws Exception {
         // 使用一次性临时票据来验证用户是否登录，如果登录过，把用户会话信息返回给站点
         // 使用完毕后，需要销毁临时票据
-        String tmpTicketValue = redisOperator.get(RedisConst.REDIS_TMP_TICKET + tmpTicket);
+        String tmpTicketValue = redisOperator.get(RedisConst.REDIS_TMP_TICKET + ":" + tmpTicket);
         if (StringUtils.isBlank(tmpTicketValue)){
+            System.out.println("使用完毕后，需要销毁临时票据");
             return IJsonResult.errorUserTicket("用户票据异常");
         }
 
         // 0、如果这个临时票据OK，则需要销毁，并且拿到cas端cookie的全局userTicket，以此再获取用户会话
         if (!tmpTicketValue.equals(MD5Utils.getMD5Str(tmpTicket))) {
+            System.out.println("如果这个临时票据OK，则需要销毁，");
             return IJsonResult.errorUserTicket("用户票据异常");
+        } else {
+            // 1、销毁临时票据
+            redisOperator.del(RedisConst.REDIS_TMP_TICKET + ":" + tmpTicket);
         }
-
-        // 1、销毁临时票据
-        redisOperator.del(RedisConst.REDIS_TMP_TICKET + tmpTicket);
         
         //1.验证并且换取用户userTicket
         String userTicket = getCookie(request, RedisConst.COOKIE_USER_TICKET);
+        System.out.println("======userTicket：" + userTicket);
         String userId = redisOperator.get(RedisConst.REDIS_USER_TICKET + ":" + userTicket);
         if (StringUtils.isBlank(userId)){
+            System.out.println("验证并且换取用户userTicket");
             return IJsonResult.errorUserTicket("用户票据异常");
         }
 
         //2.验证门票对应的user会话是否存在
         String userRedis = redisOperator.get(RedisConst.REDIS_USER_TOKEN + ":" + userId);
         if (StringUtils.isBlank(userRedis)){
+            System.out.println("验证门票对应的user会话是否存在");
             return IJsonResult.errorUserTicket("用户票据异常");
         }
 
@@ -156,6 +175,58 @@ public class CASController {
         return IJsonResult.ok(JsonUtils.jsonToPojo(userRedis, UsersVO.class));
     }
 
+    /**
+     * 退出登录
+     * @param request
+     * @param response
+     * @param userId
+     * @return
+     */
+    @PostMapping("/logout")
+    @ResponseBody
+    public IJsonResult logout(HttpServletRequest request,
+                              HttpServletResponse response,
+                              String userId){
+        // 0、获取cas中的用户门票
+        String userTicket = getCookie(request, RedisConst.COOKIE_USER_TICKET);
+
+        // 1、清除userTicket票据 redis/cookie
+        deleteCookie(RedisConst.COOKIE_USER_TICKET, response);
+        redisOperator.del(RedisConst.COOKIE_USER_TICKET + ":" + userTicket);
+
+        // 2、清除用户的全局会话（分布式会话）
+        redisOperator.del(RedisConst.REDIS_USER_TOKEN + ":"  + userId);
+
+        return IJsonResult.ok();
+    }
+
+
+    /**
+     * 校验CAS全局用户门票
+     * @param userTicket
+     * @return
+     */
+    private boolean verifyUserTicket(String userTicket){
+
+        // 0.验证CAS门票不能为空
+        if (StringUtils.isBlank(userTicket)){
+            return false;
+        }
+
+        // 1.验证CAS门票是否有效
+        String userId = redisOperator.get(RedisConst.REDIS_USER_TICKET + ":" + userTicket);
+        if (StringUtils.isBlank(userId)){
+            return false;
+        }
+
+        // 2. 验证门票对应的user会话是否存在
+        String userRedis = redisOperator.get(RedisConst.REDIS_USER_TOKEN + ":" + userId);
+        if (StringUtils.isBlank(userRedis)){
+            return false;
+        }
+        
+        return true;
+    }
 
     /**
      * 获取cookie
@@ -164,15 +235,17 @@ public class CASController {
      * @return
      */
     private String getCookie(HttpServletRequest request, String key){
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null || StringUtils.isBlank(key)){
+        Cookie[] cookieList = request.getCookies();
+        if (cookieList == null || StringUtils.isBlank(key)){
+            System.out.println("====key:" + key);
+            System.out.println("===cookieList:" + cookieList);
             return null;
         }
 
         String cookieValue = null;
-        for (int i = 0; i < cookies.length; i++){
-            if (cookies[i].getName().equals(key)){
-                cookieValue = cookies[i].getValue();
+        for (int i = 0; i < cookieList.length; i++){
+            if (cookieList[i].getName().equals(key)){
+                cookieValue = cookieList[i].getValue();
                 break;
             }
         }
@@ -188,6 +261,15 @@ public class CASController {
         Cookie cookie = new Cookie(key, val);
         cookie.setDomain("sso.com");
         cookie.setPath("/");
+        response.addCookie(cookie);
+    }
+
+    private void deleteCookie(String key,
+                              HttpServletResponse response){
+        Cookie cookie = new Cookie(key, null);
+        cookie.setDomain("sso.com");
+        cookie.setPath("/");
+        cookie.setMaxAge(-1);
         response.addCookie(cookie);
     }
 
