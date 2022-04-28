@@ -1,6 +1,7 @@
 server:
   port: 8088
-
+  servlet:
+    context-path: /yrzp
 spring:
   datasource:                                           # 数据源的相关配置
     url: jdbc:mysql://localhost:3306/foodie-shop?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true

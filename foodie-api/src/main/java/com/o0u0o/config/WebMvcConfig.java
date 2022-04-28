@@ -56,6 +56,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(userTokenInterceptor())
+                .addPathPatterns("/yrzp/*")
                 .addPathPatterns("/hello")
                 .addPathPatterns("/shopcart/add")
                 .addPathPatterns("/shopcart/del")

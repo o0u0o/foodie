@@ -62,7 +62,7 @@ public class BaseController {
     }
 
     /**
-     * 实现用户的redis会话 生成用户token 存入redis会话
+     * <h2>实现用户的redis会话 生成用户token 存入redis会话</h2>
      * @param userResult
      * @return
      */
