@@ -32,7 +32,7 @@ public class RedissonLockController {
         try {
             rLock.lock(30, TimeUnit.SECONDS);
             logger.info("我获得了锁");
-            Thread.sleep(10000);
+            Thread.sleep(20000);
         } catch (InterruptedException e){
             e.printStackTrace();
         }finally {
