@@ -11,6 +11,7 @@ public interface OrdersMapperCustom {
 
     public List<MyOrdersVO> queryMyOrders(@Param("paramsMap")Map<String, Object> map);
 
+    //查询子订单
     public int getMyOrderStatusCounts(@Param("paramsMap")Map<String, Object> map);
 
     public List<OrderStatus> getMyOrderTrend(@Param("paramsMap")Map<String, Object> map);
