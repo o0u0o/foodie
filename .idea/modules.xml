@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/foodie.iml" filepath="$PROJECT_DIR$/foodie.iml" />
       <module fileurl="file://$PROJECT_DIR$/foodie-api/foodie-api.iml" filepath="$PROJECT_DIR$/foodie-api/foodie-api.iml" />
       <module fileurl="file://$PROJECT_DIR$/foodie-cas/foodie-cas.iml" filepath="$PROJECT_DIR$/foodie-cas/foodie-cas.iml" />
       <module fileurl="file://$PROJECT_DIR$/foodie-common/foodie-common.iml" filepath="$PROJECT_DIR$/foodie-common/foodie-common.iml" />
