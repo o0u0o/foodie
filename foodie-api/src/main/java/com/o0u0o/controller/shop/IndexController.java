@@ -88,10 +88,13 @@ public class IndexController {
              * 解决方案2：
              * 布隆过滤器：代码复杂度会更大，不建议使用
              */
+
+            //对list判空，如果不为空
             if (list != null && list.size() > 0){
                 redisOperator.set("subCat:" + rootCatId, JsonUtils.objectToJson(list));
-            }else {
-                //5分钟的空缓存
+            }
+            //防止缓存被穿透 5分钟的空缓存 如果更新了Redis缓存，也会有数据
+            else {
                 redisOperator.set("subCat:" + rootCatId, JsonUtils.objectToJson(list), 5*60);
             }
 

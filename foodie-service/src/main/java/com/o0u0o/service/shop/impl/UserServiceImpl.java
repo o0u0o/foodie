@@ -7,6 +7,7 @@ import com.o0u0o.pojo.bo.UserBO;
 import com.o0u0o.service.shop.UserService;
 import com.o0u0o.utils.DateUtil;
 import com.o0u0o.utils.MD5Utils;
+import lombok.RequiredArgsConstructor;
 import org.n3r.idworker.Sid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,10 +23,10 @@ import java.util.Date;
  * @date 2020/10/25 12:25 下午
  */
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    public UsersMapper usersMapper;
+    private final UsersMapper usersMapper;
 
     /** 用户默认头像 */
     public static final String USER_FACE = "https://img.zcool.cn/community/01cfd95d145660a8012051cdb52093.png@1280w_1l_2o_100sh.png";

@@ -29,7 +29,7 @@ public interface UserService {
      * 检索用户名和密码是否匹配，用于登陆
      * @param username
      * @param password
-     * @return
+     * @return Users 用户对象
      */
     public Users queryUserForLogin(String username, String password);
 }
