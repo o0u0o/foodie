@@ -78,12 +78,15 @@ public final class CookieUtils {
         try {
             for (int i = 0; i < cookieList.length; i++) {
                 if (cookieList[i].getName().equals(cookieName)) {
-                    retValue = URLDecoder.decode(cookieList[i].getValue(), encodeString);
+                    String value = cookieList[i].getValue();
+                    if (value != null) {
+                        retValue = URLDecoder.decode(value, encodeString);
+                    }
                     break;
                 }
             }
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+            logger.error("getCookieValue decode error", e);
         }
         return retValue;
     }
@@ -172,8 +175,8 @@ public final class CookieUtils {
      */
     public static void deleteCookie(HttpServletRequest request, HttpServletResponse response,
                                     String cookieName) {
-        doSetCookie(request, response, cookieName, null, -1, false);
-//        doSetCookie(request, response, cookieName, "", -1, false);
+        // 删除 Cookie 必须将 MaxAge 设置为 0
+        doSetCookie(request, response, cookieName, null, 0, false);
     }
 
 
@@ -196,21 +199,23 @@ public final class CookieUtils {
                 cookieValue = URLEncoder.encode(cookieValue, "utf-8");
             }
             Cookie cookie = new Cookie(cookieName, cookieValue);
-            if (cookieMaxage > 0) {
+            // 注意：cookieMaxage == 0 表示删除 Cookie；< 0 表示会话级 Cookie
+            if (cookieMaxage >= 0) {
                 cookie.setMaxAge(cookieMaxage);
             }
             // 设置域名的cookie
             if (null != request) {
                 String domainName = getDomainName(request);
-                logger.info("========== domainName: {} ==========", domainName);
+                logger.debug("========== domainName: {} ==========", domainName);
                 if (!"localhost".equals(domainName)) {
                     cookie.setDomain(domainName);
                 }
             }
             cookie.setPath("/");
+            cookie.setHttpOnly(true);
             response.addCookie(cookie);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("doSetCookie error", e);
         }
     }
 
@@ -233,19 +238,21 @@ public final class CookieUtils {
                 cookieValue = URLEncoder.encode(cookieValue, encodeString);
             }
             Cookie cookie = new Cookie(cookieName, cookieValue);
-            if (cookieMaxage > 0)
+            if (cookieMaxage >= 0) {
                 cookie.setMaxAge(cookieMaxage);
+            }
             if (null != request) {// 设置域名的cookie
                 String domainName = getDomainName(request);
-                logger.info("========== domainName: {} ==========", domainName);
+                logger.debug("========== domainName: {} ==========", domainName);
                 if (!"localhost".equals(domainName)) {
                     cookie.setDomain(domainName);
                 }
             }
             cookie.setPath("/");
+            cookie.setHttpOnly(true);
             response.addCookie(cookie);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("doSetCookie error", e);
         }
     }
 
@@ -255,55 +262,45 @@ public final class CookieUtils {
      * @return
      */
     private static final String getDomainName(HttpServletRequest request) {
-        String domainName = null;
+        String domainName;
 
-        String serverName = request.getRequestURL().toString();
-        if (serverName == null || serverName.equals("")) {
-            domainName = "";
+        // 直接使用 getServerName() 获取主机名，避免硬编码 substring(7) 在 https 下越界/解析错误
+        String serverName = request.getServerName();
+        if (serverName == null || serverName.isEmpty()) {
+            return "";
+        }
+        serverName = serverName.toLowerCase();
+
+        final String[] domains = serverName.split("\\.");
+        int len = domains.length;
+        if (len > 3 && !isIp(serverName)) {
+            // www.xxx.com.cn
+            domainName = "." + domains[len - 3] + "." + domains[len - 2] + "." + domains[len - 1];
+        } else if (len <= 3 && len > 1) {
+            // xxx.com or xxx.cn
+            domainName = "." + domains[len - 2] + "." + domains[len - 1];
         } else {
-            serverName = serverName.toLowerCase();
-            serverName = serverName.substring(7);
-            final int end = serverName.indexOf("/");
-            serverName = serverName.substring(0, end);
-            if (serverName.indexOf(":") > 0) {
-                String[] ary = serverName.split("\\:");
-                serverName = ary[0];
-            }
-
-            final String[] domains = serverName.split("\\.");
-            int len = domains.length;
-            if (len > 3 && !isIp(serverName)) {
-                // www.xxx.com.cn
-                domainName = "." + domains[len - 3] + "." + domains[len - 2] + "." + domains[len - 1];
-            } else if (len <= 3 && len > 1) {
-                // xxx.com or xxx.cn
-                domainName = "." + domains[len - 2] + "." + domains[len - 1];
-            } else {
-                domainName = serverName;
-            }
+            domainName = serverName;
         }
         return domainName;
     }
 
-    public static String trimSpaces(String IP){//去掉IP字符串前后所有的空格
-        while(IP.startsWith(" ")){
-            IP= IP.substring(1,IP.length()).trim();
+    public static String trimSpaces(String ip){//去掉IP字符串前后所有的空格
+        if (ip == null) {
+            return null;
         }
-        while(IP.endsWith(" ")){
-            IP= IP.substring(0,IP.length()-1).trim();
-        }
-        return IP;
+        return ip.trim();
     }
 
-    public static boolean isIp(String IP){//判断是否是一个IP
+    public static boolean isIp(String ip){//判断是否是一个IP
         boolean b = false;
-        IP = trimSpaces(IP);
-        if(IP.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}")){
-            String s[] = IP.split("\\.");
-            if(Integer.parseInt(s[0])<255)
-                if(Integer.parseInt(s[1])<255)
-                    if(Integer.parseInt(s[2])<255)
-                        if(Integer.parseInt(s[3])<255)
+        ip = trimSpaces(ip);
+        if(ip != null && ip.matches("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}")){
+            String[] s = ip.split("\\.");
+            if(Integer.parseInt(s[0])<=255)
+                if(Integer.parseInt(s[1])<=255)
+                    if(Integer.parseInt(s[2])<=255)
+                        if(Integer.parseInt(s[3])<=255)
                             b = true;
         }
         return b;
